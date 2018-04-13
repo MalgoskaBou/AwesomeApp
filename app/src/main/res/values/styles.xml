@@ -1,0 +1,26 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="MyEditTextStyle2" parent="Widget.AppCompat.EditText">
+        <item name="colorControlActivated">@color/colorPrimaryDark</item>
+        <item name="colorControlNormal">@color/colorPrimaryDark</item>
+
+        <item name="android:layout_marginStart">50dp</item>
+    </style>
+
+    <style name="userInput" parent="AppTheme">
+        <item name="android:layout_margin">@dimen/mediumDp</item>
+        <item name="android:layout_marginTop">@dimen/smallDp</item>
+        <item name="android:textSize">@dimen/textNormal</item>
+        <item name="android:paddingStart">@dimen/smallDp</item>
+
+    </style>
+
+</resources>

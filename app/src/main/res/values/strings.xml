@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">AwesomeApp</string>
+    <string name="userAccount">Account</string>
+    <string name="nick_from_slack">Nick from slack</string>
+    <string name="log_out">Log out</string>
+    <string name="save">SAVE</string>
+
+
+    <string-array name="projects_abnd">
+        <item >card</item>
+        <item >score keeper</item>
+        <item >quiz</item>
+        <item >music app</item>
+        <item >tourist app</item>
+        <item >Strawberry</item>
+        <item >Cranberry</item>
+    </string-array>
+
+    <string-array name="projects_and">
+        <item >and 1</item>
+        <item >and 2</item>
+        <item >quiz</item>
+        <item >music app</item>
+        <item >tourist app</item>
+        <item >Strawberry</item>
+        <item >Cranberry</item>
+    </string-array>
+
+    <string-array name="projects_fend">
+        <item >fend 1</item>
+        <item >fend 2</item>
+        <item >quiz</item>
+        <item >music app</item>
+        <item >tourist app</item>
+        <item >Strawberry</item>
+        <item >Cranberry</item>
+    </string-array>
+
+    <string-array name="projects_mws">
+        <item >mws 1</item>
+        <item >mws 2</item>
+        <item >quiz</item>
+        <item >music app</item>
+        <item >tourist app</item>
+        <item >Strawberry</item>
+        <item >Cranberry</item>
+    </string-array>
+
+
+    <string-array name="tracks">
+        <item >ABND</item>
+        <item >AND</item>
+        <item >FEND</item>
+        <item >MWS</item>
+    </string-array>
+
+
+</resources>
