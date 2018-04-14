@@ -4,4 +4,9 @@
     <dimen name="mediumDp">16dp</dimen>
 
     <dimen name="textNormal">14sp</dimen>
+
+    <dimen name="wrapConstraint">0dp</dimen>
+    <dimen name="spinnerHeigth">40dp</dimen>
+    <dimen name="bigSpinnerHeigth">60dp</dimen>
+
 </resources>

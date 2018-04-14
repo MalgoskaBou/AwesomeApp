@@ -16,11 +16,37 @@
     </style>
 
     <style name="userInput" parent="AppTheme">
-        <item name="android:layout_margin">@dimen/mediumDp</item>
-        <item name="android:layout_marginTop">@dimen/smallDp</item>
+        <item name="android:layout_marginBottom">@dimen/mediumDp</item>
+        <item name="android:layout_marginStart">@dimen/mediumDp</item>
+        <item name="android:layout_marginEnd">@dimen/mediumDp</item>
         <item name="android:textSize">@dimen/textNormal</item>
         <item name="android:paddingStart">@dimen/smallDp</item>
+    </style>
 
+    <style name="userSpinner" parent="userInput">
+        <item name="android:background">@drawable/background_frame</item>
+        <item name="android:layout_width">@dimen/wrapConstraint</item>
+        <item name="android:layout_height">@dimen/spinnerHeigth</item>
+    </style>
+
+    <style name="userText" parent="AppTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/greyTextColor</item>
+        <item name="android:layout_marginStart">@dimen/mediumDp</item>
+        <item name="android:layout_marginEnd">@dimen/mediumDp</item>
+        <item name="android:layout_marginBottom">@dimen/smallDp</item>
+        <item name="android:layout_marginTop">@dimen/smallDp</item>
+    </style>
+
+    <style name="buttonUser" parent="AppTheme">
+        <item name="android:layout_marginTop">@dimen/smallDp</item>
+        <item name="android:layout_marginBottom">@dimen/smallDp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/button_bck</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
 </resources>

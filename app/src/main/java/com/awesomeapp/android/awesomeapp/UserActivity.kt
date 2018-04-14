@@ -1,7 +1,5 @@
 package com.awesomeapp.android.awesomeapp
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,10 +15,9 @@ import kotlin.collections.ArrayList
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.Toast
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.auth.FirebaseUser
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.collections.HashMap
+
+
 
 
 class UserActivity : MenuActivity() {
@@ -35,47 +32,60 @@ class UserActivity : MenuActivity() {
     //user data
     lateinit var userName: String
     lateinit var userEmail: String
-    lateinit var userUid:String
+    lateinit var userUid: String
 
+    //flag for registrated user
     val RC_SIGN_IN = 1
 
+    //user data keys
+    val USER_NAME = "userName"
+    val USER_EMAIL = "userEmail"
     val SLACK_NAME = "slackName"
     val LANGUAGE_1 = "languageFirst"
     val LANGUAGE_2 = "languageSecond"
     val CURRENT_PROJECT = "currentProject"
     val TRACK = "userTrack"
 
+    //spinner adapters
+    lateinit var spinnerAdapterTracks: ArrayAdapter<String>
+    lateinit var spinnerAdapterLanguages1: ArrayAdapter<String>
+    lateinit var spinnerAdapterLanguages2: ArrayAdapter<String>
+    lateinit var spinnerAdapterProjects: ArrayAdapter<String>
 
 
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
 
         setSupportActionBar(myToolbar)
 
-
-        myDatabase = FirebaseFirestore .getInstance()
-        myHelpData =  myDatabase.document("helpData/tracks")
+        myDatabase = FirebaseFirestore.getInstance()
+        myHelpData = myDatabase.document("helpData/tracks")
         mAuth = FirebaseAuth.getInstance()
 
-
-        //GET DATA FROM DATABASE===================================
+        //GET DATA FROM DATABASE - helpData
         getDataFromDatabase()
 
-        //DATABASE LOG IN========================================
+        //DATABASE LOG IN -
         userLogIn()
 
-        //Put user data to database==============================
-        saveBtn.setOnClickListener{v ->
+
+        //Put user data to database
+        saveBtn.setOnClickListener { _ ->
             saveUser()
         }
-
     }
 
     private fun saveUser() {
-        var userData  = HashMap<String, Any>()
-        userData[SLACK_NAME] = slackNick.text.toString()
+
+        var userData = HashMap<String, Any>()
+        userData[USER_NAME] = userName
+        userData[USER_EMAIL] = userEmail
+        if(slackNick.text == null || slackNick.text.toString().trim() == "")
+            userData[SLACK_NAME] = "undefined"
+        else
+            userData[SLACK_NAME] = slackNick.text.toString()
+
         userData[LANGUAGE_1] = lang1Spinner.selectedItem.toString()
         userData[LANGUAGE_2] = lang2Spinner.selectedItem.toString()
         userData[TRACK] = trackSpinner.selectedItem.toString()
@@ -84,26 +94,30 @@ class UserActivity : MenuActivity() {
         myUserData.set(userData).addOnSuccessListener({
             Toast.makeText(this@UserActivity, "Data saved", Toast.LENGTH_SHORT).show()
 
-        }).addOnFailureListener{
+        }).addOnFailureListener {
             Toast.makeText(this@UserActivity, "Someting wrong :( try again", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun userLogIn(){
+    private fun userLogIn() {
 
         mAuthStateListener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
             if (user != null) {
-
-                userName  = user.displayName!!
+                // User is signed in - get data from log in
+                userName = user.displayName!!
                 userEmail = user.email!!
                 userUid = user.uid
+
+                //get document with actual user from database
                 myUserData = myDatabase.document("Users/$userUid")
 
-                testText.text = "$userName $userEmail"
-                // User is signed in
+                //fetch data from database
+                fetchUserData()
+
+                welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
             } else {
-                // User is signed out
+                // User is signed out - show loggin screen
                 startActivityForResult(
                         AuthUI.getInstance()
                                 .createSignInIntentBuilder()
@@ -117,15 +131,43 @@ class UserActivity : MenuActivity() {
         }
     }
 
-    private fun getDataFromDatabase(){
+    private fun fetchUserData(){
+
+        myUserData.get().addOnSuccessListener({ snapshots ->
+
+            if(snapshots.exists()){
+                slackNick.setText(snapshots.getString(SLACK_NAME))
+                //for tracks
+                val spinnerPositionTracks = spinnerAdapterTracks.getPosition(snapshots.getString(TRACK))
+                trackSpinner.setSelection(spinnerPositionTracks)
+
+                //lang1
+                val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(snapshots.getString(LANGUAGE_1))
+                lang1Spinner.setSelection(spinnerPositionLang1)
+
+                //lang2
+                val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(snapshots.getString(LANGUAGE_2))
+                lang2Spinner.setSelection(spinnerPositionLang2)
+
+                //projects
+                val spinnerPositionProjects = spinnerAdapterProjects.getPosition(snapshots.getString(CURRENT_PROJECT))
+                projectsSpinner.setSelection(spinnerPositionProjects)
+
+            }
+        }).addOnFailureListener{
+            Toast.makeText(this@UserActivity, "Someting wrong :( can't take your data", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getDataFromDatabase() {
 
         myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
             if (e != null) {
-                Log.w("blad - ",e)
+                Log.w("blad - ", e)
                 Toast.makeText(this@UserActivity, "Error :(", Toast.LENGTH_SHORT).show()
                 return@EventListener
 
-            }else if (snapshots.exists()) {
+            } else if (snapshots.exists()) {
                 var tracksTable = snapshots.get("tracksArray") as ArrayList<String>
                 var langTable = snapshots.get("langsArray") as ArrayList<String>
 
@@ -134,50 +176,59 @@ class UserActivity : MenuActivity() {
                 var abndProjTable = snapshots.get("abndProjectsArray") as ArrayList<String>
                 var fendProjTable = snapshots.get("fendProjectsArray") as ArrayList<String>
 
-
                 //Tracks list
-                var spinnerAdapterTracks = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, tracksTable)
+                spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
                 spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 trackSpinner.adapter = spinnerAdapterTracks
 
-
-                //Projects list - changing with tracks list
-                lateinit var spinnerAdapterProjects: ArrayAdapter<String>
 
                 //Check wchih one position is choosed - like a track
                 trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
                     override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
 
-                        when(trackSpinner.selectedItem.toString()){
-                            "AND" -> {spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, andProjTable)}
-                            "ABND" -> {spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, abndProjTable)}
-                            "MWS" -> {spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, mwsProjTable)}
-                            "FEND" -> {spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, fendProjTable)}
+                        when (trackSpinner.selectedItem.toString()) {
+                            "AND" -> {
+                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, andProjTable)
+                            }
+                            "ABND" -> {
+                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, abndProjTable)
+                            }
+                            "MWS" -> {
+                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, mwsProjTable)
+                            }
+                            "FEND" -> {
+                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, fendProjTable)
+                            }
                         }
                         spinnerAdapterProjects.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         projectsSpinner.adapter = spinnerAdapterProjects
-
                     }
+
                     override fun onNothingSelected(parentView: AdapterView<*>) {
                         // do nothing
                     }
                 }
 
-                //Languages lists (there are 2 fields for this)
-                var spinnerAdapterLanguages = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, langTable)
-                spinnerAdapterLanguages.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                lang1Spinner.adapter = spinnerAdapterLanguages
-                lang2Spinner.adapter = spinnerAdapterLanguages
+                //Languages lists (there are 2 fields for this) but need get position this why I create 2 adapters
+                spinnerAdapterLanguages1 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+                spinnerAdapterLanguages1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                lang1Spinner.adapter = spinnerAdapterLanguages1
+
+                spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+                spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                lang2Spinner.adapter = spinnerAdapterLanguages2
             }
         })
     }
 
     override fun onResume() {
+
         super.onResume()
         mAuth.addAuthStateListener(mAuthStateListener)
     }
 
     override fun onPause() {
+
         super.onPause()
         mAuth.removeAuthStateListener(mAuthStateListener)
     }
