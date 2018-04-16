@@ -103,7 +103,10 @@ class UserActivity : MenuActivity() {
         userData[LANGUAGE_1] = lang1Spinner.selectedItem.toString()
         userData[LANGUAGE_2] = lang2Spinner.selectedItem.toString()
         userData[TRACK] = trackSpinner.selectedItem.toString()
-        userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
+
+        //Try to save project data in table [project name, project position on the list] - and retrive directly from position
+        var arrayProjectNameAndPosition = listOf(projectsSpinner.selectedItem.toString(), projectsSpinner.selectedItemPosition)
+        userData[CURRENT_PROJECT] = arrayProjectNameAndPosition //projectsSpinner.selectedItem.toString()
 
         //put userdata to database (path to myUserdata is declared in userLogIn function)
         myUserData.set(userData).addOnSuccessListener({
@@ -126,7 +129,7 @@ class UserActivity : MenuActivity() {
                 userUid = user.uid
 
                 //get document with actual user from database
-                myUserData = myDatabase.document("Users/$userUid")
+                myUserData = myDatabase.document("UsersCopyForTest/$userUid")
 
                 //fetch data from database
                 fetchUserData()
@@ -147,7 +150,7 @@ class UserActivity : MenuActivity() {
         }
     }
 
-    private fun fetchUserData() {
+    private fun fetchUserData(){
 
         //get data from user collection
         myUserData.get().addOnSuccessListener({ snapshots ->
