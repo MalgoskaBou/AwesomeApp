@@ -3,18 +3,20 @@ package com.awesomeapp.android.awesomeapp
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import java.util.*
-import kotlin.collections.ArrayList
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.Toast
 import kotlin.collections.HashMap
 
 class UserActivity : MenuActivity() {
@@ -30,6 +32,8 @@ class UserActivity : MenuActivity() {
     lateinit var userName: String
     lateinit var userEmail: String
     lateinit var userUid: String
+
+    private val myUser: MyUser? = MyUser()
 
     //flag for registrated user
     val RC_SIGN_IN = 1
@@ -47,8 +51,7 @@ class UserActivity : MenuActivity() {
     lateinit var spinnerAdapterTracks: ArrayAdapter<String>
     lateinit var spinnerAdapterLanguages1: ArrayAdapter<String>
     lateinit var spinnerAdapterLanguages2: ArrayAdapter<String>
-    lateinit var spinnerAdapterProjects: ArrayAdapter<String>
-
+    private val spinnerAdapterProjects: HashMap<String, ArrayAdapter<String>> = HashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,13 +65,23 @@ class UserActivity : MenuActivity() {
         //get access to users data
         mAuth = FirebaseAuth.getInstance()
 
+        // Set the listeners
+        trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
 
-        //DATABASE LOG IN -
-        userLogIn()
+                updateProjectSpinner(trackSpinner.selectedItem.toString())
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>) {
+                // do nothing
+            }
+        }
 
         //GET DATA FROM DATABASE - helpData
         getDataFromDatabase()
 
+        //DATABASE LOG IN -
+        userLogIn()
 
         //Put user data to database
         saveBtn.setOnClickListener { _ ->
@@ -79,10 +92,10 @@ class UserActivity : MenuActivity() {
     private fun saveUser() {
 
         //create hashmap with nescessary user data what I want to put to databse
-        var userData = HashMap<String, Any>()
+        val userData = HashMap<String, Any>()
         userData[USER_NAME] = userName
         userData[USER_EMAIL] = userEmail
-        if(slackNick.text == null || slackNick.text.toString().trim() == "")
+        if (slackNick.text == null || slackNick.text.toString().trim() == "")
             userData[SLACK_NAME] = "undefined"
         else
             userData[SLACK_NAME] = slackNick.text.toString()
@@ -134,37 +147,47 @@ class UserActivity : MenuActivity() {
         }
     }
 
-    private fun fetchUserData(){
+    private fun fetchUserData() {
 
         //get data from user collection
         myUserData.get().addOnSuccessListener({ snapshots ->
 
-            if(snapshots.exists()){
+            if (snapshots.exists()) {
                 slackNick.setText(snapshots.getString(SLACK_NAME))
+                myUser!!.slackNick = snapshots.getString(SLACK_NAME)
 
-                //take data in correct order
-                val spinnerPositionProjects = spinnerAdapterProjects.getPosition(snapshots.getString(CURRENT_PROJECT))
-                val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(snapshots.getString(LANGUAGE_1))
-                val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(snapshots.getString(LANGUAGE_2))
-                val spinnerPositionTracks = spinnerAdapterTracks.getPosition(snapshots.getString(TRACK))
-                Log.v("pozycja ","$spinnerPositionProjects")
+                myUser.currentProject = snapshots.getString(CURRENT_PROJECT)
+                myUser.language1 = snapshots.getString(LANGUAGE_1)
+                myUser.language2 = snapshots.getString(LANGUAGE_2)
+                myUser.track = snapshots.getString(TRACK)
 
-                //for tracks
-                trackSpinner.setSelection(spinnerPositionTracks)
-
-                //lang1
-                lang1Spinner.setSelection(spinnerPositionLang1)
-
-                //lang2
-                lang2Spinner.setSelection(spinnerPositionLang2)
-
-                //projects
-                projectsSpinner.setSelection(spinnerPositionProjects)
-
+                updateUserData()
             }
-        }).addOnFailureListener{
+        }).addOnFailureListener {
             Toast.makeText(this@UserActivity, "Someting wrong :( can't take your data", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun updateUserData() {
+        //take data in correct order
+        //val spinnerPositionProjects = spinnerAdapterProjects.getPosition(snapshots.getString(CURRENT_PROJECT))
+        val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(myUser!!.language1)
+        val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(myUser.language2)
+        val spinnerPositionTracks = spinnerAdapterTracks.getPosition(myUser.track)
+        //Log.v("pozycja ","$spinnerPositionProjects")
+
+        //for tracks
+        trackSpinner.setSelection(spinnerPositionTracks)
+
+        //lang1
+        lang1Spinner.setSelection(spinnerPositionLang1)
+
+        //lang2
+        lang2Spinner.setSelection(spinnerPositionLang2)
+
+        //projects
+        //projectsSpinner.setSelection(spinnerPositionProjects)
+
     }
 
     private fun getDataFromDatabase() {
@@ -177,48 +200,28 @@ class UserActivity : MenuActivity() {
                 return@EventListener
 
             } else if (snapshots.exists()) {
-                var tracksTable = snapshots.get("tracksArray") as ArrayList<String>
-                var langTable = snapshots.get("langsArray") as ArrayList<String>
+                val tracksTable = snapshots.get("tracksArray") as ArrayList<String>
+                val langTable = snapshots.get("langsArray") as ArrayList<String>
 
-                var andProjTable = snapshots.get("andProjectsArray") as ArrayList<String>
-                var mwsProjTable = snapshots.get("mwsProjectsArray") as ArrayList<String>
-                var abndProjTable = snapshots.get("abndProjectsArray") as ArrayList<String>
-                var fendProjTable = snapshots.get("fendProjectsArray") as ArrayList<String>
+                val andProjTable = snapshots.get("andProjectsArray") as ArrayList<String>
+                val mwsProjTable = snapshots.get("mwsProjectsArray") as ArrayList<String>
+                val abndProjTable = snapshots.get("abndProjectsArray") as ArrayList<String>
+                val fendProjTable = snapshots.get("fendProjectsArray") as ArrayList<String>
 
+                spinnerAdapterProjects.set("AND", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, andProjTable))
+                spinnerAdapterProjects.set("ABND", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, abndProjTable))
+                spinnerAdapterProjects.set("MWS", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, mwsProjTable))
+                spinnerAdapterProjects.set("FEND", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, fendProjTable))
 
                 //I add a table taken from the database to the appropriate spiners
                 //Tracks list
                 spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
                 spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 trackSpinner.adapter = spinnerAdapterTracks
-
-
-                //Check wchih one position is choosed in tracks spinner - and complete the spinner with projects on this basis
-                trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
-                    override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-
-                        when (trackSpinner.selectedItem.toString()) {
-                            "AND" -> {
-                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, andProjTable)
-                            }
-                            "ABND" -> {
-                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, abndProjTable)
-                            }
-                            "MWS" -> {
-                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, mwsProjTable)
-                            }
-                            "FEND" -> {
-                                spinnerAdapterProjects = ArrayAdapter(applicationContext, android.R.layout.simple_spinner_item, fendProjTable)
-                            }
-                        }
-                        spinnerAdapterProjects.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                        projectsSpinner.adapter = spinnerAdapterProjects
-                    }
-
-                    override fun onNothingSelected(parentView: AdapterView<*>) {
-                        // do nothing
-                    }
-                }
 
                 //Languages lists (there are 2 fields for this) but need get position this why I create 2 adapters
                 spinnerAdapterLanguages1 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
@@ -228,8 +231,23 @@ class UserActivity : MenuActivity() {
                 spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
                 spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 lang2Spinner.adapter = spinnerAdapterLanguages2
+
+                // Here we have all the spinner data available, we can now fill connect the user
+                updateUserData()
             }
         })
+    }
+
+    private fun updateProjectSpinner(selectedTrack: String) {
+
+        val selectedSpinnerAdapterProjects = spinnerAdapterProjects[selectedTrack]
+        selectedSpinnerAdapterProjects!!.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        projectsSpinner.adapter = selectedSpinnerAdapterProjects
+
+        //If the user is logged, we should try to select the right project
+        val spinnerPositionProjects = selectedSpinnerAdapterProjects
+                .getPosition(myUser!!.currentProject)
+        projectsSpinner.setSelection(spinnerPositionProjects)
     }
 
     override fun onResume() {
