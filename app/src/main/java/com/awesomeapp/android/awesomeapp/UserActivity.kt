@@ -17,19 +17,16 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.Toast
 import kotlin.collections.HashMap
 
-
-
-
 class UserActivity : MenuActivity() {
 
-    //database
+    //hooks to database
     lateinit var mAuth: FirebaseAuth
     lateinit var myDatabase: FirebaseFirestore
     lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
     lateinit var myHelpData: DocumentReference
     lateinit var myUserData: DocumentReference
 
-    //user data
+    //get user data from user panel
     lateinit var userName: String
     lateinit var userEmail: String
     lateinit var userUid: String
@@ -37,7 +34,7 @@ class UserActivity : MenuActivity() {
     //flag for registrated user
     val RC_SIGN_IN = 1
 
-    //user data keys
+    //user data keys what I want to put in database
     val USER_NAME = "userName"
     val USER_EMAIL = "userEmail"
     val SLACK_NAME = "slackName"
@@ -56,18 +53,21 @@ class UserActivity : MenuActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
-
         setSupportActionBar(myToolbar)
 
+        //get database hook
         myDatabase = FirebaseFirestore.getInstance()
+        //get helpData->tracks document
         myHelpData = myDatabase.document("helpData/tracks")
+        //get access to users data
         mAuth = FirebaseAuth.getInstance()
 
-        //GET DATA FROM DATABASE - helpData
-        getDataFromDatabase()
 
         //DATABASE LOG IN -
         userLogIn()
+
+        //GET DATA FROM DATABASE - helpData
+        getDataFromDatabase()
 
 
         //Put user data to database
@@ -78,6 +78,7 @@ class UserActivity : MenuActivity() {
 
     private fun saveUser() {
 
+        //create hashmap with nescessary user data what I want to put to databse
         var userData = HashMap<String, Any>()
         userData[USER_NAME] = userName
         userData[USER_EMAIL] = userEmail
@@ -91,6 +92,7 @@ class UserActivity : MenuActivity() {
         userData[TRACK] = trackSpinner.selectedItem.toString()
         userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
 
+        //put userdata to database (path to myUserdata is declared in userLogIn function)
         myUserData.set(userData).addOnSuccessListener({
             Toast.makeText(this@UserActivity, "Data saved", Toast.LENGTH_SHORT).show()
 
@@ -101,6 +103,7 @@ class UserActivity : MenuActivity() {
 
     private fun userLogIn() {
 
+        //check if user is login
         mAuthStateListener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
             if (user != null) {
@@ -133,24 +136,29 @@ class UserActivity : MenuActivity() {
 
     private fun fetchUserData(){
 
+        //get data from user collection
         myUserData.get().addOnSuccessListener({ snapshots ->
 
             if(snapshots.exists()){
                 slackNick.setText(snapshots.getString(SLACK_NAME))
-                //for tracks
+
+                //take data in correct order
+                val spinnerPositionProjects = spinnerAdapterProjects.getPosition(snapshots.getString(CURRENT_PROJECT))
+                val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(snapshots.getString(LANGUAGE_1))
+                val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(snapshots.getString(LANGUAGE_2))
                 val spinnerPositionTracks = spinnerAdapterTracks.getPosition(snapshots.getString(TRACK))
+                Log.v("pozycja ","$spinnerPositionProjects")
+
+                //for tracks
                 trackSpinner.setSelection(spinnerPositionTracks)
 
                 //lang1
-                val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(snapshots.getString(LANGUAGE_1))
                 lang1Spinner.setSelection(spinnerPositionLang1)
 
                 //lang2
-                val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(snapshots.getString(LANGUAGE_2))
                 lang2Spinner.setSelection(spinnerPositionLang2)
 
                 //projects
-                val spinnerPositionProjects = spinnerAdapterProjects.getPosition(snapshots.getString(CURRENT_PROJECT))
                 projectsSpinner.setSelection(spinnerPositionProjects)
 
             }
@@ -161,9 +169,10 @@ class UserActivity : MenuActivity() {
 
     private fun getDataFromDatabase() {
 
+        //get helpData (snapshotListener allow synchronize data in real time)
         myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
             if (e != null) {
-                Log.w("blad - ", e)
+                Log.w("error - ", e)
                 Toast.makeText(this@UserActivity, "Error :(", Toast.LENGTH_SHORT).show()
                 return@EventListener
 
@@ -176,13 +185,15 @@ class UserActivity : MenuActivity() {
                 var abndProjTable = snapshots.get("abndProjectsArray") as ArrayList<String>
                 var fendProjTable = snapshots.get("fendProjectsArray") as ArrayList<String>
 
+
+                //I add a table taken from the database to the appropriate spiners
                 //Tracks list
                 spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
                 spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 trackSpinner.adapter = spinnerAdapterTracks
 
 
-                //Check wchih one position is choosed - like a track
+                //Check wchih one position is choosed in tracks spinner - and complete the spinner with projects on this basis
                 trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
                     override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
 
@@ -224,6 +235,7 @@ class UserActivity : MenuActivity() {
     override fun onResume() {
 
         super.onResume()
+        //we're adding a listening to the user's login
         mAuth.addAuthStateListener(mAuthStateListener)
     }
 
