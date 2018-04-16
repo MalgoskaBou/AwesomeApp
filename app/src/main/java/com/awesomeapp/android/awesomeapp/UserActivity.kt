@@ -190,7 +190,6 @@ class UserActivity : MenuActivity() {
 
         //projects
         //projectsSpinner.setSelection(spinnerPositionProjects)
-
     }
 
     private fun getDataFromDatabase() {
