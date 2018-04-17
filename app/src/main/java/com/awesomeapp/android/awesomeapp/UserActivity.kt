@@ -1,6 +1,7 @@
 package com.awesomeapp.android.awesomeapp
 
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import java.util.*
 import kotlin.collections.HashMap
 
-class UserActivity : MenuActivity() {
+class UserActivity : AppCompatActivity() {
 
     //hooks to database
     lateinit var mAuth: FirebaseAuth
@@ -112,6 +113,10 @@ class UserActivity : MenuActivity() {
         }).addOnFailureListener {
             Toast.makeText(this@UserActivity, "Someting wrong :( try again", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun usrLogOut(){
+
     }
 
     private fun userLogIn() {
