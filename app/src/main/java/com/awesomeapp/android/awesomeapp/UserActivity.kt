@@ -85,8 +85,11 @@ class UserActivity : AppCompatActivity() {
         userLogIn()
 
         //Put user data to database
-        saveBtn.setOnClickListener { _ ->
+        saveBtn.setOnClickListener {
             saveUser()
+        }
+        logOutBtn.setOnClickListener{
+            usrLogOut()
         }
     }
 
@@ -116,7 +119,7 @@ class UserActivity : AppCompatActivity() {
     }
 
     private fun usrLogOut(){
-
+        mAuth.signOut()
     }
 
     private fun userLogIn() {
