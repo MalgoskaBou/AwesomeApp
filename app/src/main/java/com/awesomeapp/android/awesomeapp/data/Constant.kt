@@ -25,7 +25,11 @@ object Constant {
 
     //key for intent in MainActivity
     val TABLE_WITH_DATA = "TABLE"
+    //key for intent in ProjectsActivity
+    val WHICH_PROJECT = "whihProject"
+    val WHICH_TRACT = "whihTrack"
 
     //help data hook
     val myHelpData = FirebaseFirestore.getInstance().document("helpData/tracks").get()
+    val myUsers = FirebaseFirestore.getInstance().collection("Users")
 }

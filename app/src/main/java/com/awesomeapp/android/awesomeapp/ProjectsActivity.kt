@@ -19,14 +19,15 @@ class ProjectsActivity : MenuActivity() {
         setContentView(R.layout.activity_projects)
         setSupportActionBar(myToolbar)
 
+        val intent = intent;
+        var choosenProjectsExtra = intent.getStringExtra(TABLE_WITH_DATA)
+
+
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
         val projects = ArrayList<ProjectsModel>()
-        val adapter = ProjectsAdapter(projects)
-
-        val intent = intent;
-        var choosenProjectsExtra = intent.getStringExtra(TABLE_WITH_DATA)
+        val adapter = ProjectsAdapter(projects, this, choosenProjectsExtra)
 
         myHelpData.addOnCompleteListener({ task ->
             if (task.isSuccessful) {
