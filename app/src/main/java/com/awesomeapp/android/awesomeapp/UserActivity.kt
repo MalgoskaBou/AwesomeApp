@@ -1,3 +1,19 @@
+/*
+ *    Copyright 2018 MalgoskaG & Bwaim
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package com.awesomeapp.android.awesomeapp
 
 import android.os.Bundle
@@ -7,6 +23,7 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import com.awesomeapp.android.awesomeapp.R.id.*
 import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
@@ -26,8 +43,6 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_user.*
-import kotlinx.android.synthetic.main.toolbar_layout.*
 import java.util.*
 import kotlin.collections.HashMap
 
