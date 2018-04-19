@@ -10,5 +10,9 @@
     <string name="language_2">Language 2</string>
     <string name="language_1">Language 1</string>
     <string name="actual_project">Actual project</string>
+    <string name="and">AND</string>
+    <string name="abnd">ABND</string>
+    <string name="fend">FEND</string>
+    <string name="mws">MWS</string>
 
 </resources>
