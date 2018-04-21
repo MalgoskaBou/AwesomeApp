@@ -118,6 +118,7 @@ class UserActivity : AppCompatActivity() {
             Toast.makeText(this@UserActivity, "Someting wrong :( try again", Toast.LENGTH_SHORT).show()
         }
     }
+    //TODO deleteUser()
 
     private fun logOutUser() {
         mAuth.signOut()
@@ -139,6 +140,8 @@ class UserActivity : AppCompatActivity() {
 
                 //fetch data from database
                 fetchUserData()
+
+                //TODO save a new user with empty fields to the database immediately after registration
 
                 welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
             } else {

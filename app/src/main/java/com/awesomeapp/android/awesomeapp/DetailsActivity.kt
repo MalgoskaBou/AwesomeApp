@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
@@ -45,6 +46,7 @@ class DetailsActivity : MenuActivity() {
 
         loadInitialData()
 
+        //TODO make loading of new users dependent on the recyclerView scroll position or use -> SwipeRefreshLayout!!!
         loadMoreData.setOnClickListener{
             loadMoreData()
         }
@@ -96,7 +98,7 @@ class DetailsActivity : MenuActivity() {
             } else {
                 progressBar.visibility = View.GONE
 
-                //TODO check what will happend when there will be no connection to the internet
+                Toast.makeText(this,"Nothing more to load", Toast.LENGTH_SHORT).show()
                 Log.e("Event ", e.toString())
             }
         })
