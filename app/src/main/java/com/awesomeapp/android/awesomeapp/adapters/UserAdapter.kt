@@ -23,13 +23,11 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder?.slackName?.text = usersList[position].slackName
-        holder?.workOrFinished?.text = usersList[position].projProgress
         holder?.languages?.text = usersList[position].userLanguages
     }
 
     class ViewHolder (itemView: View): RecyclerView.ViewHolder(itemView){
         val slackName = itemView.userSlackName
-        val workOrFinished = itemView.duringWorkOrFinished
         val languages = itemView.languagesTxt
     }
 
