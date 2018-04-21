@@ -159,22 +159,22 @@ class UserActivity : AppCompatActivity() {
     private fun fetchUserData() {
 
         //get data from user collection
-        myUserData.get().addOnSuccessListener({ snapshots ->
+        myUserData.addSnapshotListener({ snapshot, e ->
 
-            if (snapshots.exists()) {
-                slackNick.setText(snapshots.getString(SLACK_NAME))
-                myUser!!.slackNick = snapshots.getString(SLACK_NAME)
+            if (snapshot?.exists()!!) {
+                slackNick.setText(snapshot.getString(SLACK_NAME))
+                myUser!!.slackNick = snapshot.getString(SLACK_NAME)
 
-                myUser.currentProject = snapshots.getString(CURRENT_PROJECT)
-                myUser.language1 = snapshots.getString(LANGUAGE_1)
-                myUser.language2 = snapshots.getString(LANGUAGE_2)
-                myUser.track = snapshots.getString(TRACK)
+                myUser.currentProject = snapshot.getString(CURRENT_PROJECT)
+                myUser.language1 = snapshot.getString(LANGUAGE_1)
+                myUser.language2 = snapshot.getString(LANGUAGE_2)
+                myUser.track = snapshot.getString(TRACK)
 
                 updateUserData()
+            }else{
+                Toast.makeText(this@UserActivity, "Someting wrong :( can't take your data", Toast.LENGTH_SHORT).show()
             }
-        }).addOnFailureListener {
-            Toast.makeText(this@UserActivity, "Someting wrong :( can't take your data", Toast.LENGTH_SHORT).show()
-        }
+        })
     }
 
     private fun updateUserData() {

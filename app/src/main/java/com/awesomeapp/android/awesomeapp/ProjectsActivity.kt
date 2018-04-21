@@ -42,9 +42,7 @@ class ProjectsActivity : MenuActivity() {
                 progressBar2.visibility = View.GONE
                 rv.adapter = adapter
 
-                Toast.makeText(this, "work :)", Toast.LENGTH_SHORT).show()
             } else {
-                projects.add(ProjectsModel("no data", "deadline", "somePercent%"))
                 Toast.makeText(this, "Data don't exist :(", Toast.LENGTH_SHORT).show()
             }
         })
