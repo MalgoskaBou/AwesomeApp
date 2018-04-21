@@ -23,6 +23,8 @@ import android.view.ViewGroup
 import com.awesomeapp.android.awesomeapp.R
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import kotlinx.android.synthetic.main.user_element.view.*
+import kotlinx.android.synthetic.main.user_element.view.*
+
 
 
 class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<UserAdapter.ViewHolder>() {
@@ -38,15 +40,25 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder?.slackName?.text = usersList[position].slackName
-        holder?.workOrFinished?.text = usersList[position].projProgress
         holder?.languages?.text = usersList[position].userLanguages
     }
 
     class ViewHolder (itemView: View): RecyclerView.ViewHolder(itemView){
         val slackName = itemView.userSlackName
-        val workOrFinished = itemView.duringWorkOrFinished
         val languages = itemView.languagesTxt
     }
 
+
+    // Clean all elements of the recycler
+    fun clear() {
+        usersList.clear()
+        notifyDataSetChanged()
+    }
+
+    // Add a list of users -- change to type used
+    fun addAll(list: List<UserModel>) {
+        usersList.addAll(list)
+        notifyDataSetChanged()
+    }
 
 }

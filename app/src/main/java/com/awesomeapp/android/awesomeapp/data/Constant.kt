@@ -46,6 +46,6 @@ object Constant {
     val WHICH_TRACT = "whihTrack"
 
     //help data hook
-    val myHelpData = FirebaseFirestore.getInstance().document("helpData/tracks").get()
+    val myHelpData = FirebaseFirestore.getInstance().document("helpData/tracks")
     val myUsers = FirebaseFirestore.getInstance().collection("Users")
 }
