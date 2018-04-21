@@ -65,7 +65,7 @@ class DetailsActivity : MenuActivity() {
                 users.clear()
                 for(document in snapshots){
                     val languagesToDisplay  = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
-                    users.add(UserModel(document.get(SLACK_NAME).toString(), "During work", languagesToDisplay))
+                    users.add(UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
                 }
                 progressBar.visibility = View.GONE
                 rv.adapter = adapter
