@@ -38,11 +38,11 @@ class DetailsActivity : MenuActivity() {
     val users = ArrayList<UserModel>()
     var adapter = UserAdapter(users)
     lateinit var lastVisible: DocumentSnapshot
-    lateinit var prewVisible: DocumentSnapshot
+    var positionOnList: Int = 0
     lateinit var projectNameExtra: String
     lateinit var rv: RecyclerView
 
-    val HOW_MUCH_TO_CHARGE = 10L
+    val HOW_MUCH_TO_CHARGE = 1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +59,10 @@ class DetailsActivity : MenuActivity() {
 
         loadInitialData()
 
+        loadMoreData.setOnClickListener{
+            loadMoreData()
+        }
+
     }
 
     private fun loadInitialData(){
@@ -67,20 +71,48 @@ class DetailsActivity : MenuActivity() {
 
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
-                users.clear()
+               users.clear()
                 for (document in snapshots) {
                     val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
                     users.add(UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
                 }
                 rv.adapter = adapter
+
+                lastVisible = snapshots.documents[snapshots.size() -1]
+                positionOnList += snapshots.size()
+
             } else {
                 progressBar.visibility = View.GONE
                 noOneWorkCurrently.visibility = View.VISIBLE
+
                 //TODO check what will happen when there will be no connection to the internet
                 Log.e("Event ", e.toString())
             }
         })
     }
 
+    private fun loadMoreData(){
+        val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).startAfter(lastVisible).limit(HOW_MUCH_TO_CHARGE)
+        newQuery.addSnapshotListener(this, { snapshots, e ->
+            if (snapshots?.size()!! > 0) {
 
+                for (document in snapshots) {
+                    val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
+                    users.add(positionOnList, UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
+                }
+                progressBar.visibility = View.GONE
+                rv.adapter = adapter
+
+                lastVisible = snapshots.documents[snapshots.size() -1]
+                positionOnList += snapshots.size()
+
+            } else {
+                progressBar.visibility = View.GONE
+
+                //TODO check what will happen when there will be no connection to the internet
+                Log.e("Event ", e.toString())
+            }
+        })
+
+    }
 }
