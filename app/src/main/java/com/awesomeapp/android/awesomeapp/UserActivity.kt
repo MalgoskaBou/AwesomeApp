@@ -31,7 +31,6 @@ import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
-import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
@@ -50,6 +49,7 @@ class UserActivity : AppCompatActivity() {
     lateinit var mAuth: FirebaseAuth
     lateinit var myDatabase: FirebaseFirestore
     lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
+    lateinit var myHelpData: DocumentReference
     lateinit var myUserData: DocumentReference
 
     //get user data from user panel
@@ -71,13 +71,13 @@ class UserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
-
         setSupportActionBar(myToolbar)
 
         //get database hook
         myDatabase = FirebaseFirestore.getInstance()
-
-        //get access to users data - I do it here and not in const because here the user is definitely logged in
+        //get helpData->tracks document
+        myHelpData = myDatabase.document("helpData/tracks")
+        //get access to users data
         mAuth = FirebaseAuth.getInstance()
 
         // Set the listeners
@@ -99,11 +99,11 @@ class UserActivity : AppCompatActivity() {
         userLogIn()
 
         //Put user data to database
-        saveBtn.setOnClickListener {
+        saveBtn.setOnClickListener { _ ->
             saveUser()
         }
-        logOutBtn.setOnClickListener {
-            usrLogOut()
+        logOutBtn.setOnClickListener { _ ->
+            logOutUser()
         }
     }
 
@@ -121,10 +121,7 @@ class UserActivity : AppCompatActivity() {
         userData[LANGUAGE_1] = lang1Spinner.selectedItem.toString()
         userData[LANGUAGE_2] = lang2Spinner.selectedItem.toString()
         userData[TRACK] = trackSpinner.selectedItem.toString()
-
-        //Try to save project data in table [project name, project position on the list] - and retrive directly from position
-        var arrayProjectNameAndPosition = listOf(projectsSpinner.selectedItem.toString(), projectsSpinner.selectedItemPosition)
-        userData[CURRENT_PROJECT] = arrayProjectNameAndPosition //projectsSpinner.selectedItem.toString()
+        userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
 
         //put userdata to database (path to myUserdata is declared in userLogIn function)
         myUserData.set(userData).addOnSuccessListener({
@@ -136,7 +133,7 @@ class UserActivity : AppCompatActivity() {
     }
     //TODO deleteUser()
 
-    private fun usrLogOut() {
+    private fun logOutUser() {
         mAuth.signOut()
     }
 
@@ -152,7 +149,7 @@ class UserActivity : AppCompatActivity() {
                 userUid = user.uid
 
                 //get document with actual user from database
-                myUserData = myDatabase.document("UsersCopyForTest/$userUid")
+                myUserData = myDatabase.document("Users/$userUid")
 
                 //fetch data from database
                 fetchUserData()
@@ -258,6 +255,7 @@ class UserActivity : AppCompatActivity() {
                 spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
                 spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 lang2Spinner.adapter = spinnerAdapterLanguages2
+
                 // Here we have all the spinner data available, we can now fill connect the user
                 updateUserData()
             }

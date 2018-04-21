@@ -26,8 +26,10 @@ import com.awesomeapp.android.awesomeapp.adapters.ProjectsAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
+import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_projects.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+
 
 class ProjectsActivity : MenuActivity() {
 

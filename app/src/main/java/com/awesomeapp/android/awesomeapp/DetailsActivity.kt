@@ -33,6 +33,7 @@ import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_details.*
+import kotlinx.android.synthetic.main.toolbar_layout.*
 
 class DetailsActivity : MenuActivity() {
 
@@ -48,6 +49,7 @@ class DetailsActivity : MenuActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
+        setSupportActionBar(myToolbar)
 
         val intent = intent;
         projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
@@ -78,6 +80,7 @@ class DetailsActivity : MenuActivity() {
                     val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
                     users.add(UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
                 }
+                progressBar.visibility = View.GONE
                 rv.adapter = adapter
 
                 lastVisible = snapshots.documents[snapshots.size() -1]
@@ -115,6 +118,5 @@ class DetailsActivity : MenuActivity() {
                 Log.e("Event ", e.toString())
             }
         })
-
     }
 }
