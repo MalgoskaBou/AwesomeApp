@@ -27,6 +27,7 @@ import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
+import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
 import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
@@ -72,7 +73,8 @@ class DetailsActivity : MenuActivity() {
             if(snapshots?.size()!! >0){
                 users.clear()
                 for(document in snapshots){
-                    users.add(UserModel(document.get(SLACK_NAME).toString(), "During work", document.get(LANGUAGE_1).toString()))
+                    val languagesToDisplay  = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
+                    users.add(UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
                 }
                 rv.adapter = adapter
             } else {
