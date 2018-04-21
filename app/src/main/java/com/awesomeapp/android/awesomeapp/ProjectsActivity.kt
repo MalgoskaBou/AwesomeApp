@@ -44,24 +44,20 @@ class ProjectsActivity : MenuActivity() {
         val projects = ArrayList<ProjectsModel>()
         val adapter = ProjectsAdapter(projects, this, choosenProjectsExtra)
 
-        myHelpData.addOnCompleteListener({ task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (document.exists()) {
-                    var list = document.get(choosenProjectsExtra) as ArrayList<String>
-                    for (value in list) {
-                        projects.add(ProjectsModel(value, "deadline", "somePercent%"))
-                    }
-                    rv.adapter = adapter
+        myHelpData.addSnapshotListener(this, { snapshot, e ->
+            if (snapshot != null && snapshot.exists()) {
 
-                    Toast.makeText(this, "work :)", Toast.LENGTH_SHORT).show()
-                } else {
-                    projects.add(ProjectsModel("no data", "deadline", "somePercent%"))
-                    Toast.makeText(this, "Data don't exist :(", Toast.LENGTH_SHORT).show()
+                var list = snapshot.get(choosenProjectsExtra) as ArrayList<String>
+                for (value in list) {
+                    projects.add(ProjectsModel(value, "deadline", "somePercent%"))
                 }
-                return@addOnCompleteListener
+                progressBar2.visibility = View.GONE
+                rv.adapter = adapter
+
+                Toast.makeText(this, "work :)", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Error :(", Toast.LENGTH_SHORT).show()
+                projects.add(ProjectsModel("no data", "deadline", "somePercent%"))
+                Toast.makeText(this, "Data don't exist :(", Toast.LENGTH_SHORT).show()
             }
         })
     }
