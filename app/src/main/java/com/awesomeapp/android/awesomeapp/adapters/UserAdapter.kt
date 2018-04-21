@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import com.awesomeapp.android.awesomeapp.R
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import kotlinx.android.synthetic.main.user_element.view.*
-import android.text.method.TextKeyListener.clear
 
 
 
@@ -35,5 +34,16 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
     }
 
 
+    // Clean all elements of the recycler
+    fun clear() {
+        usersList.clear()
+        notifyDataSetChanged()
+    }
+
+    // Add a list of users -- change to type used
+    fun addAll(list: List<UserModel>) {
+        usersList.addAll(list)
+        notifyDataSetChanged()
+    }
 
 }

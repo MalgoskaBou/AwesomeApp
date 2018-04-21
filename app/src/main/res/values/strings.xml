@@ -30,5 +30,6 @@
     <string name="abnd">ABND</string>
     <string name="fend">FEND</string>
     <string name="mws">MWS</string>
+    <string name="nobodyWorkNow">Currently no one is working on this project, but do not worry. Check out next projects and find someone who has already written it</string>
 
 </resources>
