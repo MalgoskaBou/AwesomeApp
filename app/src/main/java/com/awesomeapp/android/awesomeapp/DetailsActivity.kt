@@ -20,10 +20,16 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
+import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
+import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
+import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
+import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
+import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_TRACT
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
@@ -38,25 +44,39 @@ class DetailsActivity : MenuActivity() {
 
         val intent = intent;
         val projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
+
+        projectNameTxt.text = projectNameExtra
+
+        /* PROBABLY TO DELETE !!
+
         val trackExtra = intent.getStringExtra(WHICH_TRACT)
+        val trackNameToCompare: String =
+                when (trackExtra) {
+                    AND_PROJECTS -> "AND"
+                    MWS_PROJECTS -> "MWS"
+                    ABND_PROJECTS -> "ABND"
+                    FEND_PROJECTS -> "FEND"
+                    else -> "unknow"
+                }
+        //val numberOfCurrentProjToCompare: String = CURRENT_PROJECT[1] as String
+        */
 
         val users = ArrayList<UserModel>()
         var adapter = UserAdapter(users)
-
-
-        projectNameTxt.text = projectNameExtra
 
         val rv = findViewById<RecyclerView>(R.id.usersList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
         val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
         query.addSnapshotListener(this, { snapshots, _ ->
-            if (snapshots!!.size() > 0) {
+            if(snapshots?.size()!! >0){
                 users.clear()
                 for(document in snapshots){
                     users.add(UserModel(document.get(SLACK_NAME).toString(), "During work", document.get(LANGUAGE_1).toString()))
                 }
                 rv.adapter = adapter
+            } else {
+                Toast.makeText(this, "Something wrong :(", Toast.LENGTH_SHORT).show()
             }
         })
     }
