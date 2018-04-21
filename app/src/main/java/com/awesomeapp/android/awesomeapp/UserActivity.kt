@@ -23,7 +23,6 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import com.awesomeapp.android.awesomeapp.R.id.*
 import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
@@ -43,6 +42,8 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_user.*
+import kotlinx.android.synthetic.main.toolbar_layout.*
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -61,7 +62,7 @@ class UserActivity : AppCompatActivity() {
 
     private val myUser: MyUser? = MyUser()
 
-    //flag for registrated user
+    //flag for registered user
     val RC_SIGN_IN = 1
 
     //spinner adapters
@@ -73,6 +74,7 @@ class UserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
+
         setSupportActionBar(myToolbar)
 
         //get database hook
