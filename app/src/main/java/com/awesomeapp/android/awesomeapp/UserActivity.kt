@@ -18,22 +18,17 @@ package com.awesomeapp.android.awesomeapp
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
-import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
-import com.awesomeapp.android.awesomeapp.data.Constant.LANG_TABLE
-import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
-import com.awesomeapp.android.awesomeapp.data.Constant.TRACKS_ARRAY
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
@@ -41,6 +36,8 @@ import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
@@ -105,7 +102,7 @@ class UserActivity : AppCompatActivity() {
         saveBtn.setOnClickListener {
             saveUser()
         }
-        logOutBtn.setOnClickListener{
+        logOutBtn.setOnClickListener {
             usrLogOut()
         }
     }
@@ -139,7 +136,7 @@ class UserActivity : AppCompatActivity() {
     }
     //TODO deleteUser()
 
-    private fun usrLogOut(){
+    private fun usrLogOut() {
         mAuth.signOut()
     }
 
@@ -178,7 +175,7 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchUserData(){
+    private fun fetchUserData() {
 
         //get data from user collection
         myUserData.addSnapshotListener({ snapshot, e ->
@@ -193,7 +190,7 @@ class UserActivity : AppCompatActivity() {
                 myUser.track = snapshot.getString(TRACK)
 
                 updateUserData()
-            }else{
+            } else {
                 Toast.makeText(this@UserActivity, "Someting wrong :( can't take your data", Toast.LENGTH_SHORT).show()
             }
         })
@@ -222,45 +219,45 @@ class UserActivity : AppCompatActivity() {
 
     private fun getDataFromDatabase() {
 
-        //get helpData addOnCompleteListener - we dont need still synchronize data - this data does not change constantly - it will work faster
-        myHelpData.addOnCompleteListener( { task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (document.exists()) {
+        //get helpData (snapshotListener allow synchronize data in real time)
+        myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
+            if (e != null) {
+                Log.w("error - ", e)
+                Toast.makeText(this@UserActivity, "Error :(", Toast.LENGTH_SHORT).show()
+                return@EventListener
 
-                    //get data to arrays
-                    val tracksTable = document.get(TRACKS_ARRAY) as ArrayList<String>
-                    val langTable = document.get(LANG_TABLE) as ArrayList<String>
+            } else if (snapshots!!.exists()) {
+                val tracksTable = snapshots.get("tracksArray") as ArrayList<String>
+                val langTable = snapshots.get("langsArray") as ArrayList<String>
 
-                    val andProjTable = document.get(AND_PROJECTS) as ArrayList<String>
-                    val mwsProjTable = document.get(MWS_PROJECTS) as ArrayList<String>
-                    val abndProjTable = document.get(ABND_PROJECTS) as ArrayList<String>
-                    val fendProjTable = document.get(FEND_PROJECTS) as ArrayList<String>
+                val andProjTable = snapshots.get("andProjectsArray") as ArrayList<String>
+                val mwsProjTable = snapshots.get("mwsProjectsArray") as ArrayList<String>
+                val abndProjTable = snapshots.get("abndProjectsArray") as ArrayList<String>
+                val fendProjTable = snapshots.get("fendProjectsArray") as ArrayList<String>
 
-                    spinnerAdapterProjects.set("AND", ArrayAdapter(applicationContext,
-                            android.R.layout.simple_spinner_item, andProjTable))
-                    spinnerAdapterProjects.set("ABND", ArrayAdapter(applicationContext,
-                            android.R.layout.simple_spinner_item, abndProjTable))
-                    spinnerAdapterProjects.set("MWS", ArrayAdapter(applicationContext,
-                            android.R.layout.simple_spinner_item, mwsProjTable))
-                    spinnerAdapterProjects.set("FEND", ArrayAdapter(applicationContext,
-                            android.R.layout.simple_spinner_item, fendProjTable))
+                spinnerAdapterProjects.set("AND", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, andProjTable))
+                spinnerAdapterProjects.set("ABND", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, abndProjTable))
+                spinnerAdapterProjects.set("MWS", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, mwsProjTable))
+                spinnerAdapterProjects.set("FEND", ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, fendProjTable))
 
-                    //I add a table taken from the database to the appropriate spiners
-                    //Tracks list
-                    spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
-                    spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    trackSpinner.adapter = spinnerAdapterTracks
+                //I add a table taken from the database to the appropriate spiners
+                //Tracks list
+                spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
+                spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                trackSpinner.adapter = spinnerAdapterTracks
 
-                    //Languages lists (there are 2 fields for this) but need get position this why I create 2 adapters
-                    spinnerAdapterLanguages1 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
-                    spinnerAdapterLanguages1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    lang1Spinner.adapter = spinnerAdapterLanguages1
+                //Languages lists (there are 2 fields for this) but need get position this why I create 2 adapters
+                spinnerAdapterLanguages1 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+                spinnerAdapterLanguages1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                lang1Spinner.adapter = spinnerAdapterLanguages1
 
-                    spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
-                    spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    lang2Spinner.adapter = spinnerAdapterLanguages2
-                }
+                spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+                spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                lang2Spinner.adapter = spinnerAdapterLanguages2
                 // Here we have all the spinner data available, we can now fill connect the user
                 updateUserData()
             }
