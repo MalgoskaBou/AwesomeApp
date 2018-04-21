@@ -21,7 +21,7 @@
     <string name="log_out">LOG OUT</string>
     <string name="save">SAVE</string>
 
-    <string name="welcome_message">Hello, %1$s! (%2$s)</string>
+    <string name="welcome_message">Hello, %1$s! \n(%2$s)</string>
     <string name="your_track">Your track</string>
     <string name="language_2">Language 2</string>
     <string name="language_1">Language 1</string>
