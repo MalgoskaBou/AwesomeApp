@@ -27,6 +27,7 @@ import com.awesomeapp.android.awesomeapp.R
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_TRACT
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
+import kotlinx.android.synthetic.main.projects_element.view.*
 
 
 class ProjectsAdapter (val projectsList: ArrayList<ProjectsModel>, val context: Context, val whihTrack: String): RecyclerView.Adapter<ProjectsAdapter.ViewHolder>() {
@@ -41,9 +42,9 @@ class ProjectsAdapter (val projectsList: ArrayList<ProjectsModel>, val context: 
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder?.projectNameTxt?.text = projectsList[position].projName
-        holder?.deadLineTxt?.text = projectsList[position].deadline
-        holder?.percentOfUsersTxt?.text = projectsList[position].percentOfUsers
+        holder.projectNameTxt.text = projectsList[position].projName
+        holder.deadLineTxt.text = projectsList[position].deadline
+        holder.percentOfUsersTxt.text = projectsList[position].percentOfUsers
 
         val intentToDetails = Intent(context, DetailsActivity::class.java)
 

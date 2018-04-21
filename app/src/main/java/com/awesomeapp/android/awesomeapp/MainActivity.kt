@@ -24,6 +24,8 @@ import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.toolbar_layout.*
 
 
 class MainActivity : MenuActivity() {

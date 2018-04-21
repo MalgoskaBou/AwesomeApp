@@ -28,6 +28,7 @@ import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_TRACT
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
+import kotlinx.android.synthetic.main.activity_details.*
 
 class DetailsActivity : MenuActivity() {
 
@@ -49,8 +50,8 @@ class DetailsActivity : MenuActivity() {
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
         val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
-        query.addSnapshotListener(this, { snapshots, e ->
-            if(snapshots.size()>0){
+        query.addSnapshotListener(this, { snapshots, _ ->
+            if (snapshots!!.size() > 0) {
                 users.clear()
                 for(document in snapshots){
                     users.add(UserModel(document.get(SLACK_NAME).toString(), "During work", document.get(LANGUAGE_1).toString()))

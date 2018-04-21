@@ -37,7 +37,7 @@ class ConstantData{
                 Toast.makeText(activity, "Error :(", Toast.LENGTH_SHORT).show()
                 return@EventListener
 
-            } else if (snapshots.exists()) {
+            } else if (snapshots!!.exists()) {
                 var tracksTable = snapshots.get("tracksArray") as ArrayList<String>
                 var langTable = snapshots.get("langsArray") as ArrayList<String>
 

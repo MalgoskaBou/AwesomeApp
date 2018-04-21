@@ -22,6 +22,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.awesomeapp.android.awesomeapp.R
 import com.awesomeapp.android.awesomeapp.model.UserModel
+import kotlinx.android.synthetic.main.user_element.view.*
+
 
 class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<UserAdapter.ViewHolder>() {
 
