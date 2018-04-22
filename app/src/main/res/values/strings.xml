@@ -31,5 +31,12 @@
     <string name="fend">FEND</string>
     <string name="mws">MWS</string>
     <string name="nobodyWorkNow">Currently no one is working on this project, but do not worry. Check out next projects and find someone who has already written it</string>
+    <string name="andTrack">AND Track</string>
+    <string name="abndTrack">ABND Track</string>
+    <string name="fendTrack">FEND Track</string>
+    <string name="mwsTrack">MWS Track</string>
+    <string name="userAvatar">user avatar</string>
+    <string name="testString">TextView</string>
+    <string name="buttonTestString">Button</string>
 
 </resources>

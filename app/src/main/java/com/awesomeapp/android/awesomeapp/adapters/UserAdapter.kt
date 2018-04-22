@@ -20,11 +20,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import com.awesomeapp.android.awesomeapp.R
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import kotlinx.android.synthetic.main.user_element.view.*
-import kotlinx.android.synthetic.main.user_element.view.*
-
 
 
 class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<UserAdapter.ViewHolder>() {
@@ -39,18 +38,17 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder?.slackName?.text = usersList[position].slackName
-        holder?.languages?.text = usersList[position].userLanguages
+        holder.slackName?.text = usersList[position].slackName
+        holder.languages?.text = usersList[position].userLanguages
     }
 
     class ViewHolder (itemView: View): RecyclerView.ViewHolder(itemView){
-        val slackName = itemView.userSlackName
-        val languages = itemView.languagesTxt
+        val slackName: TextView? = itemView.userSlackName
+        val languages: TextView? = itemView.languagesTxt
     }
 
-
     // Clean all elements of the recycler
-    fun clear() {
+    /*fun clear() {
         usersList.clear()
         notifyDataSetChanged()
     }
@@ -59,6 +57,5 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
     fun addAll(list: List<UserModel>) {
         usersList.addAll(list)
         notifyDataSetChanged()
-    }
-
+    }*/
 }

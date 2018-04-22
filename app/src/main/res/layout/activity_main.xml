@@ -31,6 +31,7 @@
         android:layout_height="0dp"
         android:layout_margin="@dimen/mediumDp"
         android:background="@drawable/background_frame_bold"
+        android:contentDescription="@string/andTrack"
         android:paddingBottom="70dp"
         android:paddingTop="40dp"
         android:scaleType="fitCenter"
@@ -38,7 +39,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:srcCompat="@drawable/ic_myandroid" />
+        app:srcCompat="@drawable/ic_my_android" />
 
    <TextView
        android:id="@+id/andAndroidText"
@@ -58,12 +59,13 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/background_frame_bold"
+        android:contentDescription="@string/abndTrack"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintStart_toEndOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:srcCompat="@drawable/ic_myandroid"
+        app:srcCompat="@drawable/ic_my_android"
         android:layout_margin="@dimen/mediumDp"
         android:paddingTop="40dp"
         android:paddingBottom="70dp"/>
@@ -85,6 +87,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/mediumDp"
+        android:contentDescription="@string/fendTrack"
         android:background="@drawable/background_frame_bold"
         android:paddingBottom="70dp"
         android:paddingTop="40dp"
@@ -93,7 +96,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline"
-        app:srcCompat="@drawable/ic_mywww" />
+        app:srcCompat="@drawable/ic_my_www" />
 
     <TextView
         android:id="@+id/fendAndroidText"
@@ -114,6 +117,7 @@
         android:layout_margin="@dimen/mediumDp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
+        android:contentDescription="@string/mwsTrack"
         android:background="@drawable/background_frame_bold"
         android:paddingBottom="70dp"
         android:paddingTop="40dp"
@@ -122,7 +126,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="@+id/guideline"
-        app:srcCompat="@drawable/ic_mywww" />
+        app:srcCompat="@drawable/ic_my_www" />
 
     <TextView
         android:id="@+id/mwsAndroidText"

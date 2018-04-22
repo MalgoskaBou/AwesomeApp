@@ -43,29 +43,29 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import java.util.*
 import kotlin.collections.HashMap
 
+//flag for registered user
+private const val RC_SIGN_IN = 1
+
 class UserActivity : AppCompatActivity() {
 
     //hooks to database
-    lateinit var mAuth: FirebaseAuth
-    lateinit var myDatabase: FirebaseFirestore
-    lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
-    lateinit var myHelpData: DocumentReference
-    lateinit var myUserData: DocumentReference
+    private lateinit var mAuth: FirebaseAuth
+    private lateinit var myDatabase: FirebaseFirestore
+    private lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
+    private lateinit var myHelpData: DocumentReference
+    private lateinit var myUserData: DocumentReference
 
     //get user data from user panel
-    lateinit var userName: String
-    lateinit var userEmail: String
-    lateinit var userUid: String
+    private lateinit var userName: String
+    private lateinit var userEmail: String
+    private lateinit var userUid: String
 
     private val myUser: MyUser? = MyUser()
 
-    //flag for registered user
-    val RC_SIGN_IN = 1
-
     //spinner adapters
-    lateinit var spinnerAdapterTracks: ArrayAdapter<String>
-    lateinit var spinnerAdapterLanguages1: ArrayAdapter<String>
-    lateinit var spinnerAdapterLanguages2: ArrayAdapter<String>
+    private lateinit var spinnerAdapterTracks: ArrayAdapter<String>
+    private lateinit var spinnerAdapterLanguages1: ArrayAdapter<String>
+    private lateinit var spinnerAdapterLanguages2: ArrayAdapter<String>
     private val spinnerAdapterProjects: HashMap<String, ArrayAdapter<String>> = HashMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -109,7 +109,7 @@ class UserActivity : AppCompatActivity() {
 
     private fun saveUser() {
 
-        //create hashmap with nescessary user data what I want to put to databse
+        //create hashMap with necessary user data what I want to put to database
         val userData = HashMap<String, Any>()
         userData[USER_NAME] = userName
         userData[USER_EMAIL] = userEmail
@@ -128,9 +128,10 @@ class UserActivity : AppCompatActivity() {
             Toast.makeText(this@UserActivity, "Data saved", Toast.LENGTH_SHORT).show()
 
         }).addOnFailureListener {
-            Toast.makeText(this@UserActivity, "Someting wrong :( try again", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@UserActivity, "Something wrong :( try again", Toast.LENGTH_SHORT).show()
         }
     }
+
     //TODO deleteUser()
 
     private fun logOutUser() {
@@ -158,7 +159,7 @@ class UserActivity : AppCompatActivity() {
 
                 welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
             } else {
-                // User is signed out - show loggin screen
+                // User is signed out - show login screen
                 startActivityForResult(
                         AuthUI.getInstance()
                                 .createSignInIntentBuilder()
@@ -175,7 +176,7 @@ class UserActivity : AppCompatActivity() {
     private fun fetchUserData() {
 
         //get data from user collection
-        myUserData.addSnapshotListener({ snapshot, e ->
+        myUserData.addSnapshotListener({ snapshot, _ ->
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
@@ -188,18 +189,16 @@ class UserActivity : AppCompatActivity() {
 
                 updateUserData()
             } else {
-                Toast.makeText(this@UserActivity, "Someting wrong :( can't take your data", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@UserActivity, "Something wrong :( can't take your data", Toast.LENGTH_SHORT).show()
             }
         })
     }
 
     private fun updateUserData() {
         //take data in correct order
-        //val spinnerPositionProjects = spinnerAdapterProjects.getPosition(snapshots.getString(CURRENT_PROJECT))
         val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(myUser!!.language1)
         val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(myUser.language2)
         val spinnerPositionTracks = spinnerAdapterTracks.getPosition(myUser.track)
-        //Log.v("pozycja ","$spinnerPositionProjects")
 
         //for tracks
         trackSpinner.setSelection(spinnerPositionTracks)
@@ -210,8 +209,6 @@ class UserActivity : AppCompatActivity() {
         //lang2
         lang2Spinner.setSelection(spinnerPositionLang2)
 
-        //projects
-        //projectsSpinner.setSelection(spinnerPositionProjects)
     }
 
     private fun getDataFromDatabase() {
@@ -224,24 +221,29 @@ class UserActivity : AppCompatActivity() {
                 return@EventListener
 
             } else if (snapshots!!.exists()) {
-                val tracksTable = snapshots.get("tracksArray") as ArrayList<String>
-                val langTable = snapshots.get("langsArray") as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val tracksTable = snapshots["tracksArray"] as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val langTable = snapshots["langsArray"] as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val andProjTable = snapshots["andProjectsArray"] as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val mwsProjTable = snapshots["mwsProjectsArray"] as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val abndProjTable = snapshots["abndProjectsArray"] as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val fendProjTable = snapshots["fendProjectsArray"] as ArrayList<String>
 
-                val andProjTable = snapshots.get("andProjectsArray") as ArrayList<String>
-                val mwsProjTable = snapshots.get("mwsProjectsArray") as ArrayList<String>
-                val abndProjTable = snapshots.get("abndProjectsArray") as ArrayList<String>
-                val fendProjTable = snapshots.get("fendProjectsArray") as ArrayList<String>
+                spinnerAdapterProjects["AND"] = ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, andProjTable)
+                spinnerAdapterProjects["ABND"] = ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, abndProjTable)
+                spinnerAdapterProjects["MWS"] = ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, mwsProjTable)
+                spinnerAdapterProjects["FEND"] = ArrayAdapter(applicationContext,
+                        android.R.layout.simple_spinner_item, fendProjTable)
 
-                spinnerAdapterProjects.set("AND", ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, andProjTable))
-                spinnerAdapterProjects.set("ABND", ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, abndProjTable))
-                spinnerAdapterProjects.set("MWS", ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, mwsProjTable))
-                spinnerAdapterProjects.set("FEND", ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, fendProjTable))
-
-                //I add a table taken from the database to the appropriate spiners
+                //I add a table taken from the database to the appropriate spinners
                 //Tracks list
                 spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
                 spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
