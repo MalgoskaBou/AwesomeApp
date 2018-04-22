@@ -14,14 +14,8 @@
   ~    limitations under the License.
   -->
 
-<resources>
-    <dimen name="smallDp">8dp</dimen>
-    <dimen name="mediumDp">16dp</dimen>
-
-    <dimen name="textNormal">14sp</dimen>
-
-    <dimen name="wrapConstraint">0dp</dimen>
-    <dimen name="spinnerHeight">40dp</dimen>
-    <dimen name="bigSpinnerHeight">60dp</dimen>
-
-</resources>
+<full-backup-content>
+    <include
+        domain="sharedpref"
+        path="." />
+</full-backup-content>

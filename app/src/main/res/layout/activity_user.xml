@@ -28,9 +28,9 @@
     <Spinner
         android:id="@+id/projectsSpinner"
         style="@style/userSpinner"
-        android:layout_height="@dimen/bigSpinnerHeigth"
+        android:layout_height="@dimen/bigSpinnerHeight"
         android:layout_marginTop="@dimen/smallDp"
-        android:drawableEnd="@drawable/ic_droparrow"
+        android:drawableEnd="@drawable/ic_drop_arrow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/actualProjectTxt" />
@@ -75,7 +75,7 @@
     <Spinner
         android:id="@+id/lang1Spinner"
         style="@style/userSpinner"
-        app:layout_constraintBottom_toTopOf="@+id/yourTracTxt"
+        app:layout_constraintBottom_toTopOf="@+id/yourTrackTxt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -108,7 +108,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/yourTracTxt"
+        android:id="@+id/yourTrackTxt"
         style="@style/userText"
         android:text="@string/your_track"
         app:layout_constraintBottom_toTopOf="@+id/trackSpinner"

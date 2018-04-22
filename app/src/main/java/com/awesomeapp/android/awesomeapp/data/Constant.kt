@@ -22,28 +22,28 @@ import com.google.firebase.firestore.FirebaseFirestore
 object Constant {
 
     //database model - helpdata
-    val TRACKS_ARRAY = "tracksArray"
-    val LANG_TABLE = "langsArray"
+    //val TRACKS_ARRAY = "tracksArray"
+    //val LANG_TABLE = "langsArray"
 
-    val AND_PROJECTS = "andProjectsArray"
-    val MWS_PROJECTS = "mwsProjectsArray"
-    val ABND_PROJECTS = "abndProjectsArray"
-    val FEND_PROJECTS = "fendProjectsArray"
+    const val AND_PROJECTS = "andProjectsArray"
+    const val MWS_PROJECTS = "mwsProjectsArray"
+    const val ABND_PROJECTS = "abndProjectsArray"
+    const val FEND_PROJECTS = "fendProjectsArray"
 
     //database model - user
-    val USER_NAME = "userName"
-    val USER_EMAIL = "userEmail"
-    val SLACK_NAME = "slackName"
-    val LANGUAGE_1 = "languageFirst"
-    val LANGUAGE_2 = "languageSecond"
-    val CURRENT_PROJECT = "currentProject"
-    val TRACK = "userTrack"
+    const val USER_NAME = "userName"
+    const val USER_EMAIL = "userEmail"
+    const val SLACK_NAME = "slackName"
+    const val LANGUAGE_1 = "languageFirst"
+    const val LANGUAGE_2 = "languageSecond"
+    const val CURRENT_PROJECT = "currentProject"
+    const val TRACK = "userTrack"
 
     //key for intent in MainActivity
-    val TABLE_WITH_DATA = "TABLE"
+    const val TABLE_WITH_DATA = "TABLE"
     //key for intent in ProjectsActivity
-    val WHICH_PROJECT = "whihProject"
-    val WHICH_TRACT = "whihTrack"
+    const val WHICH_PROJECT = "whichProject"
+    const val WHICH_TRACT = "whichTrack"
 
     //help data hook
     val myHelpData = FirebaseFirestore.getInstance().document("helpData/tracks")

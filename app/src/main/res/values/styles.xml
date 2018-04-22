@@ -42,7 +42,7 @@
     <style name="userSpinner" parent="userInput">
         <item name="android:background">@drawable/background_frame</item>
         <item name="android:layout_width">@dimen/wrapConstraint</item>
-        <item name="android:layout_height">@dimen/spinnerHeigth</item>
+        <item name="android:layout_height">@dimen/spinnerHeight</item>
     </style>
 
     <style name="userText" parent="AppTheme">

@@ -35,23 +35,23 @@ import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 
+private const val HOW_MUCH_TO_CHARGE = 1L
+
 class DetailsActivity : MenuActivity() {
 
-    val users = ArrayList<UserModel>()
-    var adapter = UserAdapter(users)
-    lateinit var lastVisible: DocumentSnapshot
-    var positionOnList: Int = 0
-    lateinit var projectNameExtra: String
-    lateinit var rv: RecyclerView
-
-    val HOW_MUCH_TO_CHARGE = 1L
+    private val users = ArrayList<UserModel>()
+    private var adapter = UserAdapter(users)
+    private lateinit var lastVisible: DocumentSnapshot
+    private var positionOnList: Int = 0
+    private lateinit var projectNameExtra: String
+    private lateinit var rv: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
         setSupportActionBar(myToolbar)
 
-        val intent = intent;
+        val intent = intent
         projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
 
         projectNameTxt.text = projectNameExtra
