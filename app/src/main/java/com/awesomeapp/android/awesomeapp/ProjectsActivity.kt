@@ -26,7 +26,6 @@ import com.awesomeapp.android.awesomeapp.adapters.ProjectsAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
-import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_projects.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 
@@ -38,20 +37,21 @@ class ProjectsActivity : MenuActivity() {
         setContentView(R.layout.activity_projects)
         setSupportActionBar(myToolbar)
 
-        val intent = intent;
-        var choosenProjectsExtra = intent.getStringExtra(TABLE_WITH_DATA)
+        val intent = intent
+        val chosenProjectsExtra = intent.getStringExtra(TABLE_WITH_DATA)
 
 
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
         val projects = ArrayList<ProjectsModel>()
-        val adapter = ProjectsAdapter(projects, this, choosenProjectsExtra)
+        val adapter = ProjectsAdapter(projects, this, chosenProjectsExtra)
 
-        myHelpData.addSnapshotListener(this, { snapshot, e ->
+        myHelpData.addSnapshotListener(this, { snapshot, _ ->
             if (snapshot != null && snapshot.exists()) {
 
-                var list = snapshot.get(choosenProjectsExtra) as ArrayList<String>
+                @Suppress("UNCHECKED_CAST")
+                val list = snapshot[chosenProjectsExtra] as ArrayList<String>
                 for (value in list) {
                     projects.add(ProjectsModel(value, "deadline", "somePercent%"))
                 }
