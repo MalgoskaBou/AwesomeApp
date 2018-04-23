@@ -18,6 +18,8 @@ package com.awesomeapp.android.awesomeapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.NonNull
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -34,7 +36,9 @@ import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
 import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
@@ -107,6 +111,9 @@ class UserActivity : AppCompatActivity() {
         logOutBtn.setOnClickListener { _ ->
             logOutUser()
         }
+        deleteUserButton.setOnClickListener {
+            deleteUser()
+        }
     }
 
     private fun saveUser() {
@@ -134,7 +141,42 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    //TODO deleteUser()
+    private fun deleteUser() {
+
+        val currentUser = mAuth.currentUser
+
+        currentUser!!.getIdToken(true)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val token = task.result.token!!
+
+                        val credential = if (token.isEmpty()) {
+                            val userPassword = EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
+                            EmailAuthProvider.getCredential(userEmail, userPassword)
+                        } else {
+                            //Doesn't matter if it was Facebook Sign-in or others. It will always work using GoogleAuthProvider for whatever the provider.
+                            GoogleAuthProvider.getCredential(token, null)
+                        }
+
+                        currentUser.reauthenticate(credential)
+                                .addOnCompleteListener({
+
+                                    //Delete data from database
+                                    myUserData.delete()
+
+                                    //Calling delete to remove the user and wait for a result.
+                                    currentUser.delete().addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+
+                                            Toast.makeText(this@UserActivity, "User deleted successfully", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                    startActivity(Intent(this@UserActivity, MainActivity::class.java))
+                                    finish()
+                                })
+                    }
+                }
+    }
 
     private fun logOutUser() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener {

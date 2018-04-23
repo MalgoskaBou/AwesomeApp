@@ -38,5 +38,6 @@
     <string name="userAvatar">user avatar</string>
     <string name="testString">TextView</string>
     <string name="buttonTestString">Button</string>
+    <string name="delete_user">Delete user</string>
 
 </resources>
