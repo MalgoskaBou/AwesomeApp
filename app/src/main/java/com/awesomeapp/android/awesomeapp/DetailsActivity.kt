@@ -16,6 +16,7 @@
 
 package com.awesomeapp.android.awesomeapp
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -33,6 +34,7 @@ import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 
 private const val HOW_MUCH_TO_CHARGE = 1L
@@ -45,6 +47,8 @@ class DetailsActivity : MenuActivity() {
     private var positionOnList: Int = 0
     private lateinit var projectNameExtra: String
     private lateinit var rv: RecyclerView
+    private var myProgressBar: ProgressDialog? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +60,8 @@ class DetailsActivity : MenuActivity() {
 
         projectNameTxt.text = projectNameExtra
         noOneWorkCurrently.visibility = View.GONE
+        myProgressBar = indeterminateProgressDialog("Wait for data loading")
+        myProgressBar?.show()
 
         rv = findViewById(R.id.usersList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
@@ -63,31 +69,32 @@ class DetailsActivity : MenuActivity() {
         loadInitialData()
 
         //TODO make loading of new users dependent on the recyclerView scroll position or use -> SwipeRefreshLayout!!!
-        loadMoreData.setOnClickListener{
+        loadMoreData.setOnClickListener {
             loadMoreData()
         }
 
     }
 
-    private fun loadInitialData(){
+    private fun loadInitialData() {
 
         val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).limit(HOW_MUCH_TO_CHARGE)
 
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
-               users.clear()
+                users.clear()
                 for (document in snapshots) {
                     val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
                     users.add(UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
                 }
-                progressBar.visibility = View.GONE
+                myProgressBar?.dismiss()
+
                 rv.adapter = adapter
 
-                lastVisible = snapshots.documents[snapshots.size() -1]
+                lastVisible = snapshots.documents[snapshots.size() - 1]
                 positionOnList += snapshots.size()
 
             } else {
-                progressBar.visibility = View.GONE
+                myProgressBar?.dismiss()
                 noOneWorkCurrently.visibility = View.VISIBLE
 
                 //TODO check what will happen when there will be no connection to the internet
@@ -96,7 +103,7 @@ class DetailsActivity : MenuActivity() {
         })
     }
 
-    private fun loadMoreData(){
+    private fun loadMoreData() {
         val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).startAfter(lastVisible).limit(HOW_MUCH_TO_CHARGE)
         newQuery.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
@@ -105,16 +112,15 @@ class DetailsActivity : MenuActivity() {
                     val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
                     users.add(positionOnList, UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
                 }
-                progressBar.visibility = View.GONE
+                myProgressBar?.dismiss()
                 rv.adapter = adapter
 
-                lastVisible = snapshots.documents[snapshots.size() -1]
+                lastVisible = snapshots.documents[snapshots.size() - 1]
                 positionOnList += snapshots.size()
 
             } else {
-                progressBar.visibility = View.GONE
-
-               toast("Nothing more to load")
+                myProgressBar?.dismiss()
+                toast("Nothing more to load")
                 Log.e("Event ", e.toString())
             }
         })
