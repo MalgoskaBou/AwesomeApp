@@ -16,6 +16,7 @@
 
 package com.awesomeapp.android.awesomeapp
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -27,10 +28,14 @@ import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import kotlinx.android.synthetic.main.activity_projects.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 
 
 class ProjectsActivity : MenuActivity() {
+
+    private var myProgressBar: ProgressDialog? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +44,9 @@ class ProjectsActivity : MenuActivity() {
 
         val intent = intent
         val chosenProjectsExtra = intent.getStringExtra(TABLE_WITH_DATA)
+
+        myProgressBar = indeterminateProgressDialog("Wait for data loading")
+        myProgressBar?.show()
 
 
         val rv = findViewById<RecyclerView>(R.id.projectsList)
@@ -55,7 +63,7 @@ class ProjectsActivity : MenuActivity() {
                 for (value in list) {
                     projects.add(ProjectsModel(value, "deadline", "somePercent%"))
                 }
-                progressBar2.visibility = View.GONE
+                myProgressBar?.dismiss()
                 rv.adapter = adapter
 
             } else {
