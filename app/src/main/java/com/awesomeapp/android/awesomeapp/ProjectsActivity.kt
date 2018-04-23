@@ -21,13 +21,13 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.Toast
 import com.awesomeapp.android.awesomeapp.adapters.ProjectsAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import kotlinx.android.synthetic.main.activity_projects.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.toast
 
 
 class ProjectsActivity : MenuActivity() {
@@ -59,7 +59,7 @@ class ProjectsActivity : MenuActivity() {
                 rv.adapter = adapter
 
             } else {
-                Toast.makeText(this, "Data don't exist :(", Toast.LENGTH_SHORT).show()
+                toast("Data don't exist :(")
             }
         })
     }

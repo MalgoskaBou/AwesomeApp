@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.Toast
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
@@ -34,6 +33,7 @@ import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.toast
 
 private const val HOW_MUCH_TO_CHARGE = 1L
 
@@ -114,7 +114,7 @@ class DetailsActivity : MenuActivity() {
             } else {
                 progressBar.visibility = View.GONE
 
-                Toast.makeText(this,"Nothing more to load", Toast.LENGTH_SHORT).show()
+               toast("Nothing more to load")
                 Log.e("Event ", e.toString())
             }
         })
