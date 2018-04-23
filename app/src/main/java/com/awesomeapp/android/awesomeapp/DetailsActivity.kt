@@ -22,16 +22,21 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
+import com.awesomeapp.android.awesomeapp.data.Constant
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
+import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.indeterminateProgressDialog
@@ -66,22 +71,68 @@ class DetailsActivity : MenuActivity() {
         rv = findViewById(R.id.usersList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
-        loadInitialData()
+        initialiseLanguages()
+
+        loadUsers(null)
 
         //TODO make loading of new users dependent on the recyclerView scroll position or use -> SwipeRefreshLayout!!!
         loadMoreData.setOnClickListener {
-            loadMoreData()
+            loadMoreUsers()
+        }
+
+        languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+                clearUsers()
+                //TODO do both filter better, it's ugly
+                loadUsers(LANGUAGE_1)
+                loadUsers(LANGUAGE_2)
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>) {
+                // do nothing
+            }
         }
 
     }
 
-    private fun loadInitialData() {
+    private fun initialiseLanguages() {
+        myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
+            if (e != null) {
+                Log.w("error - ", e)
+                toast("Error :(")
+                return@EventListener
 
-        val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).limit(HOW_MUCH_TO_CHARGE)
+            } else if (snapshots!!.exists()) {
+                @Suppress("UNCHECKED_CAST")
+                val langTable = snapshots[Constant.LANG_TABLE] as java.util.ArrayList<String>
+                langTable.add(0, getString(R.string.noLanguageFilter))
+
+                val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                languageSpinner.adapter = spinnerAdapter
+
+            }
+        })
+    }
+
+    /**
+     * Load the users currently working on the selected project
+     */
+    private fun loadUsers(filterName: String?) {
+
+        var query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).limit(HOW_MUCH_TO_CHARGE)
+
+        // if a language is selected, we filter on this
+        if (languageSpinner.selectedItemPosition > 0) {
+            if (LANGUAGE_1 == filterName) {
+                query = query.whereEqualTo(LANGUAGE_1, languageSpinner.selectedItem)
+            } else if (LANGUAGE_2 == filterName) {
+                query = query.whereEqualTo(LANGUAGE_2, languageSpinner.selectedItem)
+            }
+        }
 
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
-                users.clear()
                 for (document in snapshots) {
                     val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
                     users.add(UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay))
@@ -94,6 +145,7 @@ class DetailsActivity : MenuActivity() {
                 positionOnList += snapshots.size()
 
             } else {
+
                 myProgressBar?.dismiss()
                 noOneWorkCurrently.visibility = View.VISIBLE
 
@@ -103,7 +155,10 @@ class DetailsActivity : MenuActivity() {
         })
     }
 
-    private fun loadMoreData() {
+    /**
+     * Load more users
+     */
+    private fun loadMoreUsers() {
         val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).startAfter(lastVisible).limit(HOW_MUCH_TO_CHARGE)
         newQuery.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
@@ -124,5 +179,14 @@ class DetailsActivity : MenuActivity() {
                 Log.e("Event ", e.toString())
             }
         })
+    }
+
+    /**
+     * Clean the activity before a reload of the users
+     */
+    private fun clearUsers() {
+        noOneWorkCurrently.visibility = View.GONE
+        users.clear()
+        rv.removeAllViews()
     }
 }

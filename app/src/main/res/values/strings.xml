@@ -39,5 +39,7 @@
     <string name="testString">TextView</string>
     <string name="buttonTestString">Button</string>
     <string name="delete_user">Delete user</string>
+    <string name="language">Language</string>
+    <string name="noLanguageFilter">No language filer</string>
 
 </resources>
