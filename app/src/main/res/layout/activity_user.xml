@@ -118,8 +118,24 @@
         android:id="@+id/welcomeText"
         style="@style/userText"
         android:text="@string/welcome_message"
+        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/slackNick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/deleteUserButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/smallDp"
+        android:layout_marginTop="@dimen/smallDp"
+        android:background="@null"
+        android:text="@string/delete_user"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
+
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/toolbar" />
 
 </android.support.constraint.ConstraintLayout>
