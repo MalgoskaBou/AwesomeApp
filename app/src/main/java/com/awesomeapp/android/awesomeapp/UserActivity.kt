@@ -18,8 +18,6 @@ package com.awesomeapp.android.awesomeapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.annotation.NonNull
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
@@ -36,8 +34,6 @@ import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
 import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -45,8 +41,14 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 import java.util.*
 import kotlin.collections.HashMap
+
+
 
 
 //flag for registered user
@@ -109,10 +111,20 @@ class UserActivity : AppCompatActivity() {
             saveUser()
         }
         logOutBtn.setOnClickListener { _ ->
-            logOutUser()
+
+            alert("are you sure that you want log out?") {
+                title = "Log out"
+                yesButton { logOutUser() }
+                noButton { }
+            }.show()
         }
+
         deleteUserButton.setOnClickListener {
-            deleteUser()
+            alert("are you sure that you want delete your account?") {
+                title = "Delete account"
+                yesButton { deleteUser() }
+                noButton { }
+            }.show()
         }
     }
 
@@ -236,7 +248,7 @@ class UserActivity : AppCompatActivity() {
 
                 updateUserData()
             } else {
-                Toast.makeText(this@UserActivity, "Something wrong :( can't take your data", Toast.LENGTH_SHORT).show()
+                toast("Something wrong :( can't take your data")
             }
         })
     }
@@ -264,7 +276,7 @@ class UserActivity : AppCompatActivity() {
         myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
             if (e != null) {
                 Log.w("error - ", e)
-                Toast.makeText(this@UserActivity, "Error :(", Toast.LENGTH_SHORT).show()
+                toast("Error :(")
                 return@EventListener
 
             } else if (snapshots!!.exists()) {
@@ -321,6 +333,16 @@ class UserActivity : AppCompatActivity() {
         val spinnerPositionProjects = selectedSpinnerAdapterProjects
                 .getPosition(myUser!!.currentProject)
         projectsSpinner.setSelection(spinnerPositionProjects)
+    }
+
+    private fun dialogBuilder(myTitle:String, myContent: String, myFun: () -> Void){
+
+        alert(myContent) {
+            title = myTitle
+            yesButton { myFun()}
+            noButton { }
+        }.show()
+
     }
 
     override fun onResume() {

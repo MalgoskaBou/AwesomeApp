@@ -59,6 +59,10 @@ dependencies {
 
     implementation 'com.android.support:support-v4:27.1.1'
     implementation 'com.android.support:design:27.1.1'
+
+    //anko
+    implementation "org.jetbrains.anko:anko:$anko_version"
+
 }
 
 apply plugin: 'com.google.gms.google-services'
