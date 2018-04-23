@@ -248,7 +248,8 @@ class UserActivity : AppCompatActivity() {
 
                 updateUserData()
             } else {
-                toast("Something wrong :( can't take your data")
+                toast("Choose your patch and current project")
+                saveUser()
             }
         })
     }
@@ -333,16 +334,6 @@ class UserActivity : AppCompatActivity() {
         val spinnerPositionProjects = selectedSpinnerAdapterProjects
                 .getPosition(myUser!!.currentProject)
         projectsSpinner.setSelection(spinnerPositionProjects)
-    }
-
-    private fun dialogBuilder(myTitle:String, myContent: String, myFun: () -> Void){
-
-        alert(myContent) {
-            title = myTitle
-            yesButton { myFun()}
-            noButton { }
-        }.show()
-
     }
 
     override fun onResume() {
