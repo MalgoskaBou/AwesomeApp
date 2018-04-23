@@ -299,32 +299,32 @@ class UserActivity : AppCompatActivity() {
 
             } else if (snapshots!!.exists()) {
                 @Suppress("UNCHECKED_CAST")
-                val tracksTable = snapshots["tracksArray"] as ArrayList<String>
+                val tracksTable = snapshots[TRACKS_ARRAY] as ArrayList<String>
                 tracksTable.sort()
                 tracksTable.add(0, getString(R.string.selectTrack))
 
                 @Suppress("UNCHECKED_CAST")
-                val langTable = snapshots["langsArray"] as ArrayList<String>
+                val langTable = snapshots[LANG_TABLE] as ArrayList<String>
                 langTable.sort()
                 langTable.add(0, getString(R.string.selectLanguage))
 
                 @Suppress("UNCHECKED_CAST")
-                val andProjTable = snapshots["andProjectsArray"] as ArrayList<String>
+                val andProjTable = snapshots[AND_PROJECTS] as ArrayList<String>
                 andProjTable.sort()
                 andProjTable.add(0, getString(R.string.selectProject))
 
                 @Suppress("UNCHECKED_CAST")
-                val mwsProjTable = snapshots["mwsProjectsArray"] as ArrayList<String>
+                val mwsProjTable = snapshots[MWS_PROJECTS] as ArrayList<String>
                 mwsProjTable.sort()
                 mwsProjTable.add(0, getString(R.string.selectProject))
 
                 @Suppress("UNCHECKED_CAST")
-                val abndProjTable = snapshots["abndProjectsArray"] as ArrayList<String>
+                val abndProjTable = snapshots[ABND_PROJECTS] as ArrayList<String>
                 abndProjTable.sort()
                 abndProjTable.add(0, getString(R.string.selectProject))
 
                 @Suppress("UNCHECKED_CAST")
-                val fendProjTable = snapshots["fendProjectsArray"] as ArrayList<String>
+                val fendProjTable = snapshots[FEND_PROJECTS] as ArrayList<String>
                 fendProjTable.sort()
                 fendProjTable.add(0, getString(R.string.selectProject))
 
