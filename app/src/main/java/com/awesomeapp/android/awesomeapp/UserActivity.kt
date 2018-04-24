@@ -25,11 +25,17 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
+import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
+import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
+import com.awesomeapp.android.awesomeapp.data.Constant.LANG_TABLE
+import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
+import com.awesomeapp.android.awesomeapp.data.Constant.TRACKS_ARRAY
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
 import com.awesomeapp.android.awesomeapp.model.MyUser
@@ -49,6 +55,7 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
 import java.util.*
 import kotlin.collections.HashMap
+
 
 //flag for registered user
 private const val RC_SIGN_IN = 1
@@ -320,6 +327,7 @@ class UserActivity : AppCompatActivity() {
                 val fendProjTable = snapshots["fendProjectsArray"] as ArrayList<String>
                 fendProjTable.sort()
                 fendProjTable.add(0, getString(R.string.selectProject))
+
 
                 spinnerAdapterProjects["AND"] = ArrayAdapter(applicationContext,
                         android.R.layout.simple_spinner_item, andProjTable)
