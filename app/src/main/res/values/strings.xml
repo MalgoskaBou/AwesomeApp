@@ -41,5 +41,7 @@
     <string name="delete_user">Delete user</string>
     <string name="language">Language</string>
     <string name="noLanguageFilter">No language filer</string>
+    <string name="nothingToLoad">Nothing to load</string>
+    <string name="more">More&#8230;</string>
 
 </resources>
