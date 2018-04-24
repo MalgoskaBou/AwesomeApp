@@ -66,14 +66,14 @@
         app:layout_constraintStart_toEndOf="@+id/logOutBtn" />
 
     <Spinner
-        android:id="@+id/lang2Spinner"
+        android:id="@+id/lang1Spinner"
         style="@style/userSpinner"
         app:layout_constraintBottom_toTopOf="@+id/language2Txt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Spinner
-        android:id="@+id/lang1Spinner"
+        android:id="@+id/lang2Spinner"
         style="@style/userSpinner"
         app:layout_constraintBottom_toTopOf="@+id/yourTrackTxt"
         app:layout_constraintEnd_toEndOf="parent"
@@ -97,14 +97,14 @@
         android:id="@+id/language1Txt"
         style="@style/userText"
         android:text="@string/language_1"
-        app:layout_constraintBottom_toTopOf="@+id/lang2Spinner"
+        app:layout_constraintBottom_toTopOf="@+id/lang1Spinner"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/language2Txt"
         style="@style/userText"
         android:text="@string/language_2"
-        app:layout_constraintBottom_toTopOf="@+id/lang1Spinner"
+        app:layout_constraintBottom_toTopOf="@+id/lang2Spinner"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
