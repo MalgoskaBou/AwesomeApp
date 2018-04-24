@@ -22,8 +22,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 object Constant {
 
     //database model - helpdata
-    //val TRACKS_ARRAY = "tracksArray"
-    //val LANG_TABLE = "langsArray"
+    const val TRACKS_ARRAY = "tracksArray"
+    const val LANG_TABLE = "langsArray"
 
     const val AND_PROJECTS = "andProjectsArray"
     const val MWS_PROJECTS = "mwsProjectsArray"

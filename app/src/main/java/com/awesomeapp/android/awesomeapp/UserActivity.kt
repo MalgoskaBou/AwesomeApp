@@ -25,16 +25,24 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
+import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
+import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
+import com.awesomeapp.android.awesomeapp.data.Constant.LANG_TABLE
+import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
+import com.awesomeapp.android.awesomeapp.data.Constant.TRACKS_ARRAY
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
 import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.*
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
@@ -47,8 +55,6 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
 import java.util.*
 import kotlin.collections.HashMap
-
-
 
 
 //flag for registered user
@@ -282,17 +288,17 @@ class UserActivity : AppCompatActivity() {
 
             } else if (snapshots!!.exists()) {
                 @Suppress("UNCHECKED_CAST")
-                val tracksTable = snapshots["tracksArray"] as ArrayList<String>
+                val tracksTable = snapshots[TRACKS_ARRAY] as ArrayList<String>
                 @Suppress("UNCHECKED_CAST")
-                val langTable = snapshots["langsArray"] as ArrayList<String>
+                val langTable = snapshots[LANG_TABLE] as ArrayList<String>
                 @Suppress("UNCHECKED_CAST")
-                val andProjTable = snapshots["andProjectsArray"] as ArrayList<String>
+                val andProjTable = snapshots[AND_PROJECTS] as ArrayList<String>
                 @Suppress("UNCHECKED_CAST")
-                val mwsProjTable = snapshots["mwsProjectsArray"] as ArrayList<String>
+                val mwsProjTable = snapshots[MWS_PROJECTS] as ArrayList<String>
                 @Suppress("UNCHECKED_CAST")
-                val abndProjTable = snapshots["abndProjectsArray"] as ArrayList<String>
+                val abndProjTable = snapshots[ABND_PROJECTS] as ArrayList<String>
                 @Suppress("UNCHECKED_CAST")
-                val fendProjTable = snapshots["fendProjectsArray"] as ArrayList<String>
+                val fendProjTable = snapshots[FEND_PROJECTS] as ArrayList<String>
 
                 spinnerAdapterProjects["AND"] = ArrayAdapter(applicationContext,
                         android.R.layout.simple_spinner_item, andProjTable)
