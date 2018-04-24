@@ -42,6 +42,8 @@ import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+
 
 private const val HOW_MUCH_TO_CHARGE = 1L
 
@@ -55,6 +57,7 @@ class DetailsActivity : MenuActivity() {
     private lateinit var projectNameExtra: String
     private lateinit var rv: RecyclerView
     private var myProgressBar: ProgressDialog? = null
+    private lateinit var swipeLayout: SwipyRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,10 +80,10 @@ class DetailsActivity : MenuActivity() {
 
         loadUsers()
 
-        //TODO make loading of new users dependent on the recyclerView scroll position or use -> SwipeRefreshLayout!!!
-        loadMoreData.setOnClickListener {
+        swipeLayout = findViewById(R.id.swipyrefreshlayout)
+        swipeLayout.setOnRefreshListener({
             loadMoreUsers()
-        }
+        })
     }
 
     /**
@@ -126,6 +129,7 @@ class DetailsActivity : MenuActivity() {
             getUsers(newQuery)
         } else {
             toast(getString(R.string.nothingToLoad))
+            swipeLayout.isRefreshing = false
         }
     }
 
@@ -150,9 +154,12 @@ class DetailsActivity : MenuActivity() {
 
             } else {
                 toast(getString(R.string.nothingToLoad))
+                swipeLayout.isRefreshing = false
                 Log.e("Event ", e.toString())
             }
             myProgressBar?.dismiss()
+            swipeLayout.isRefreshing = false
+
 
             if (users.size == 0) {
                 noOneWorkCurrently.visibility = View.VISIBLE

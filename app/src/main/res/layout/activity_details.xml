@@ -91,17 +91,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/elementLayout" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/usersList"
+
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:id="@+id/swipyrefreshlayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/languageSpinner">
+        app:layout_constraintTop_toBottomOf="@+id/languageSpinner"
+        android:layout_marginTop="8dp"
+        app:srl_direction="bottom">
 
-    </android.support.v7.widget.RecyclerView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/usersList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+       />
+
+    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
+
 
     <TextView
         android:id="@+id/noOneWorkCurrently"
@@ -118,14 +127,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/usersList" />
+        app:layout_constraintTop_toTopOf="@+id/swipyrefreshlayout" />
 
-    <Button
-        android:id="@+id/loadMoreData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/more"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>
