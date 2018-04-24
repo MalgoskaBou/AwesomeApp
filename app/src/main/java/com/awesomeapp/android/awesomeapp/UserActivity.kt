@@ -131,6 +131,20 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
+    private fun ifUserIsVerified() {
+
+        if (!mAuth.currentUser?.isEmailVerified!!) {
+
+            mAuth.currentUser?.sendEmailVerification()
+
+            alert("Verificate your email") {
+                positiveButton("Send me link") { mAuth.currentUser?.sendEmailVerification() }
+                negativeButton("Refresh") { mAuth.currentUser?.reload() }
+
+            }.show()
+        }
+    }
+
     private fun saveUser() {
 
         //create hashMap with necessary user data what I want to put to database
@@ -186,19 +200,27 @@ class UserActivity : AppCompatActivity() {
 
                         currentUser.reauthenticate(credential)
                                 .addOnCompleteListener({
+                                    if (task.isSuccessful) {
 
+                                        //Calling delete to remove the user and wait for a result.
+                                        currentUser.delete().addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
 
-                                    //Calling delete to remove the user and wait for a result.
-                                    currentUser.delete().addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
+                                                toast("User deleted successfully")
+                                                //Delete data from database
+                                                myUserData.delete()
+                                            } else {
 
-                                            toast( "User deleted successfully")
-                                            //Delete data from database
-                                            myUserData.delete()
+                                                alert(getString(R.string.log_out_message_for_delete_user)) {
+                                                    positiveButton("OK") {  }
+                                                }.show()
+
+                                                Log.e("usun usera ", "${task.exception}")
+                                            }
                                         }
+                                        startActivity<MainActivity>()
+                                        finish()
                                     }
-                                    startActivity<MainActivity>()
-                                    finish()
                                 })
                     }
                 }
@@ -227,6 +249,7 @@ class UserActivity : AppCompatActivity() {
 
                 //fetch data from database
                 fetchUserData()
+                ifUserIsVerified()
 
                 //TODO save a new user with empty fields to the database immediately after registration
 
