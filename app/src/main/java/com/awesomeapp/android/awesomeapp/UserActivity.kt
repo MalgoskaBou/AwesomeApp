@@ -49,10 +49,7 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.noButton
-import org.jetbrains.anko.toast
-import org.jetbrains.anko.yesButton
+import org.jetbrains.anko.*
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -190,17 +187,17 @@ class UserActivity : AppCompatActivity() {
                         currentUser.reauthenticate(credential)
                                 .addOnCompleteListener({
 
-                                    //Delete data from database
-                                    myUserData.delete()
 
                                     //Calling delete to remove the user and wait for a result.
                                     currentUser.delete().addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
 
-                                            Toast.makeText(this@UserActivity, "User deleted successfully", Toast.LENGTH_SHORT).show()
+                                            toast( "User deleted successfully")
+                                            //Delete data from database
+                                            myUserData.delete()
                                         }
                                     }
-                                    startActivity(Intent(this@UserActivity, MainActivity::class.java))
+                                    startActivity<MainActivity>()
                                     finish()
                                 })
                     }
@@ -209,7 +206,7 @@ class UserActivity : AppCompatActivity() {
 
     private fun logOutUser() {
         AuthUI.getInstance().signOut(this).addOnCompleteListener {
-            startActivity(Intent(this@UserActivity, MainActivity::class.java))
+            startActivity<MainActivity>()
             finish()
         }
     }
@@ -252,7 +249,7 @@ class UserActivity : AppCompatActivity() {
     private fun fetchUserData() {
 
         //get data from user collection
-        myUserData.addSnapshotListener({ snapshot, _ ->
+        myUserData.addSnapshotListener(this, { snapshot, _ ->
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
