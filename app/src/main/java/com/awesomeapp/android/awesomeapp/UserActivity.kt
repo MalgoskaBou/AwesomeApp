@@ -34,7 +34,9 @@ import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
 import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
 import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.firebase.ui.auth.AuthUI
-import com.google.firebase.auth.*
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
@@ -47,9 +49,6 @@ import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
 import java.util.*
 import kotlin.collections.HashMap
-
-
-
 
 //flag for registered user
 private const val RC_SIGN_IN = 1
@@ -139,10 +138,21 @@ class UserActivity : AppCompatActivity() {
         else
             userData[SLACK_NAME] = slackNick.text.toString()
 
-        userData[LANGUAGE_1] = lang1Spinner.selectedItem.toString()
-        userData[LANGUAGE_2] = lang2Spinner.selectedItem.toString()
-        userData[TRACK] = trackSpinner.selectedItem.toString()
-        userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
+        if (lang1Spinner.selectedItemPosition > 0) {
+            userData[LANGUAGE_1] = lang1Spinner.selectedItem.toString()
+        }
+
+        if (lang2Spinner.selectedItemPosition > 0) {
+            userData[LANGUAGE_2] = lang2Spinner.selectedItem.toString()
+        }
+
+        if (trackSpinner.selectedItemPosition > 0) {
+            userData[TRACK] = trackSpinner.selectedItem.toString()
+        }
+
+        if (projectsSpinner.selectedItemPosition > 0) {
+            userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
+        }
 
         //put userdata to database (path to myUserdata is declared in userLogIn function)
         myUserData.set(userData).addOnSuccessListener({
@@ -283,16 +293,33 @@ class UserActivity : AppCompatActivity() {
             } else if (snapshots!!.exists()) {
                 @Suppress("UNCHECKED_CAST")
                 val tracksTable = snapshots["tracksArray"] as ArrayList<String>
+                tracksTable.sort()
+                tracksTable.add(0, getString(R.string.selectTrack))
+
                 @Suppress("UNCHECKED_CAST")
                 val langTable = snapshots["langsArray"] as ArrayList<String>
+                langTable.sort()
+                langTable.add(0, getString(R.string.selectLanguage))
+
                 @Suppress("UNCHECKED_CAST")
                 val andProjTable = snapshots["andProjectsArray"] as ArrayList<String>
+                andProjTable.sort()
+                andProjTable.add(0, getString(R.string.selectProject))
+
                 @Suppress("UNCHECKED_CAST")
                 val mwsProjTable = snapshots["mwsProjectsArray"] as ArrayList<String>
+                mwsProjTable.sort()
+                mwsProjTable.add(0, getString(R.string.selectProject))
+
                 @Suppress("UNCHECKED_CAST")
                 val abndProjTable = snapshots["abndProjectsArray"] as ArrayList<String>
+                abndProjTable.sort()
+                abndProjTable.add(0, getString(R.string.selectProject))
+
                 @Suppress("UNCHECKED_CAST")
                 val fendProjTable = snapshots["fendProjectsArray"] as ArrayList<String>
+                fendProjTable.sort()
+                fendProjTable.add(0, getString(R.string.selectProject))
 
                 spinnerAdapterProjects["AND"] = ArrayAdapter(applicationContext,
                         android.R.layout.simple_spinner_item, andProjTable)
@@ -327,13 +354,17 @@ class UserActivity : AppCompatActivity() {
     private fun updateProjectSpinner(selectedTrack: String) {
 
         val selectedSpinnerAdapterProjects = spinnerAdapterProjects[selectedTrack]
-        selectedSpinnerAdapterProjects!!.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        projectsSpinner.adapter = selectedSpinnerAdapterProjects
+        if (selectedSpinnerAdapterProjects != null) {
+            selectedSpinnerAdapterProjects.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            projectsSpinner.adapter = selectedSpinnerAdapterProjects
 
-        //If the user is logged, we should try to select the right project
-        val spinnerPositionProjects = selectedSpinnerAdapterProjects
-                .getPosition(myUser!!.currentProject)
-        projectsSpinner.setSelection(spinnerPositionProjects)
+            //If the user is logged, we should try to select the right project
+            val spinnerPositionProjects = selectedSpinnerAdapterProjects
+                    .getPosition(myUser!!.currentProject)
+            projectsSpinner.setSelection(spinnerPositionProjects)
+        } else {
+            projectsSpinner.adapter = null
+        }
     }
 
     override fun onResume() {

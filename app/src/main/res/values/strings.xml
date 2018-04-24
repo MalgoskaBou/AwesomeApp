@@ -39,5 +39,8 @@
     <string name="testString">TextView</string>
     <string name="buttonTestString">Button</string>
     <string name="delete_user">Delete user</string>
+    <string name="selectTrack">Select a track</string>
+    <string name="selectLanguage">Select a language</string>
+    <string name="selectProject">Select a project</string>
 
 </resources>
