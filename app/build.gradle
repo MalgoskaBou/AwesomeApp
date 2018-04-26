@@ -66,6 +66,7 @@ dependencies {
     //SwipyRefreshLayout
     implementation 'com.github.omadahealth:swipy:1.2.3@aar'
 
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -21,6 +21,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 object Constant {
 
+    const val TRACK_ABND = "ABND"
+    const val TRACK_AND = "AND"
+    const val TRACK_FEND = "FEND"
+    const val TRACK_MWS = "MWS"
+
     //database model - helpdata
     const val TRACKS_ARRAY = "tracksArray"
     const val LANG_TABLE = "langsArray"
