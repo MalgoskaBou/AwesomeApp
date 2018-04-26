@@ -16,25 +16,19 @@
 
 package com.awesomeapp.android.awesomeapp
 
-import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import android.widget.LinearLayout
 import com.awesomeapp.android.awesomeapp.adapters.ProjectsAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
-import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
-import com.awesomeapp.android.awesomeapp.model.ProjectsModel
-import kotlinx.android.synthetic.main.activity_projects.*
+import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import kotlinx.android.synthetic.main.toolbar_layout.*
-import org.jetbrains.anko.indeterminateProgressDialog
-import org.jetbrains.anko.toast
 
 
 class ProjectsActivity : MenuActivity() {
 
-    private var myProgressBar: ProgressDialog? = null
+//    private var myProgressBar: ProgressDialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,32 +37,34 @@ class ProjectsActivity : MenuActivity() {
         setSupportActionBar(myToolbar)
 
         val intent = intent
-        val chosenProjectsExtra = intent.getStringExtra(TABLE_WITH_DATA)
+        val track = intent.getStringExtra(TABLE_WITH_DATA)
 
-        myProgressBar = indeterminateProgressDialog("Wait for data loading")
-        myProgressBar?.show()
+//        myProgressBar = indeterminateProgressDialog("Wait for data loading")
+//        myProgressBar?.show()
 
 
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
-        val projects = ArrayList<ProjectsModel>()
-        val adapter = ProjectsAdapter(projects, this, chosenProjectsExtra)
+        val projects = QueryUtils.getProjects(track)
+        val adapter = ProjectsAdapter(projects, this, track)
 
-        myHelpData.addSnapshotListener(this, { snapshot, _ ->
-            if (snapshot != null && snapshot.exists()) {
+        rv.adapter = adapter
 
-                @Suppress("UNCHECKED_CAST")
-                val list = snapshot[chosenProjectsExtra] as ArrayList<String>
-                for (value in list) {
-                    projects.add(ProjectsModel(value, "deadline", "somePercent%"))
-                }
-                myProgressBar?.dismiss()
-                rv.adapter = adapter
-
-            } else {
-                toast("Data don't exist :(")
-            }
-        })
+//        myHelpData.addSnapshotListener(this, { snapshot, _ ->
+//            if (snapshot != null && snapshot.exists()) {
+//
+//                @Suppress("UNCHECKED_CAST")
+//                val list = snapshot[track] as ArrayList<String>
+//                for (value in list) {
+//                    projects.add(ProjectsModel(value, Date(), 0, 0))
+//                }
+////                myProgressBar?.dismiss()
+//                rv.adapter = adapter
+//
+//            } else {
+//                toast("Data don't exist :(")
+//            }
+//        })
     }
 }
