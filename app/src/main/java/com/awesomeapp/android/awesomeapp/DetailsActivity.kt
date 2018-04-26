@@ -85,7 +85,6 @@ class DetailsActivity : MenuActivity() {
         swipeLayout.setOnRefreshListener({
             loadMoreUsers()
         })
-
     }
 
     /**

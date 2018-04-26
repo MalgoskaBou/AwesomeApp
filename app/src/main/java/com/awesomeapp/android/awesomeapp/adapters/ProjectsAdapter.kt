@@ -43,14 +43,14 @@ class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val co
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.projectNameTxt?.text = projectsList[position].projName
-        holder.deadLineTxt?.text = projectsList[position].deadline
-        holder.percentOfUsersTxt?.text = projectsList[position].percentOfUsers
+        holder.projectNameTxt?.text = projectsList[position].name
+        holder.deadLineTxt?.text = projectsList[position].deadline.toString()
+        holder.percentOfUsersTxt?.text = projectsList[position].nbUsers.toString()
 
         val intentToDetails = Intent(context, DetailsActivity::class.java)
 
         holder.itemView.setOnClickListener{
-            intentToDetails.putExtra(WHICH_PROJECT, projectsList[position].projName)
+            intentToDetails.putExtra(WHICH_PROJECT, projectsList[position].name)
             intentToDetails.putExtra(WHICH_TRACT, whichTrack)
             context.startActivity(intentToDetails)
         }
