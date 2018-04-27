@@ -190,11 +190,11 @@ class UserActivity : AppCompatActivity() {
             }
 
             if (oldLang1 != lang1) {
-                updateUserByLang(myUserData.id, oldLang1, lang1)
+                updateUserByLang(myUserData.id, userData[CURRENT_PROJECT] as String, oldLang1, lang1)
             }
 
             if (oldLang2 != lang2) {
-                updateUserByLang(myUserData.id, oldLang2, lang2)
+                updateUserByLang(myUserData.id, userData[CURRENT_PROJECT] as String, oldLang2, lang2)
             }
 
         }).addOnFailureListener {
@@ -211,7 +211,7 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUserByLang(user: String, old: String, new: String) {
+    private fun updateUserByLang(user: String, project: String, old: String, new: String) {
         myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener({
             Log.d(UserActivity::class.simpleName, "User $user deleted on $old")
         }).addOnFailureListener {
@@ -220,7 +220,7 @@ class UserActivity : AppCompatActivity() {
 
         if (new != "") {
             val userByLanguageData = HashMap<String, Any>()
-            userByLanguageData["know"] = true
+            userByLanguageData["project"] = project
             myDatabase.collection("UsersByLanguage").document("${new}_$user").set(userByLanguageData)
                     .addOnSuccessListener({
                         Log.d(UserActivity::class.simpleName, "User $user saved on $new")
@@ -266,8 +266,8 @@ class UserActivity : AppCompatActivity() {
                                                 }
 
                                                 //Delete user from UsersByLanguage
-                                                updateUserByLang(myUserData.id, myUser.language1, "")
-                                                updateUserByLang(myUserData.id, myUser.language2, "")
+                                                updateUserByLang(myUserData.id, "", myUser.language1, "")
+                                                updateUserByLang(myUserData.id, "", myUser.language2, "")
 
                                                 myUserData.delete()
 

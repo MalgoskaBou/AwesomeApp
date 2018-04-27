@@ -28,9 +28,6 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 
 class ProjectsActivity : MenuActivity() {
 
-//    private var myProgressBar: ProgressDialog? = null
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_projects)
@@ -38,10 +35,6 @@ class ProjectsActivity : MenuActivity() {
 
         val intent = intent
         val track = intent.getStringExtra(TABLE_WITH_DATA)
-
-//        myProgressBar = indeterminateProgressDialog("Wait for data loading")
-//        myProgressBar?.show()
-
 
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
@@ -52,20 +45,5 @@ class ProjectsActivity : MenuActivity() {
 
         rv.adapter = adapter
 
-//        myHelpData.addSnapshotListener(this, { snapshot, _ ->
-//            if (snapshot != null && snapshot.exists()) {
-//
-//                @Suppress("UNCHECKED_CAST")
-//                val list = snapshot[track] as ArrayList<String>
-//                for (value in list) {
-//                    projects.add(ProjectsModel(value, Date(), 0, 0))
-//                }
-////                myProgressBar?.dismiss()
-//                rv.adapter = adapter
-//
-//            } else {
-//                toast("Data don't exist :(")
-//            }
-//        })
     }
 }
