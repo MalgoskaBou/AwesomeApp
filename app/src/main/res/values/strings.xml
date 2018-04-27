@@ -47,6 +47,8 @@
     <string name="selectLanguage">Select a language</string>
     <string name="selectProject">Select a project</string>
     <string name="log_out_message_for_delete_user">for security reasons you have to log out and log in again to delete your account correctly</string>
+    <string name="open_slack">Open Slack</string>
+    <string name="slack">Open slack</string>
 
 
 </resources>

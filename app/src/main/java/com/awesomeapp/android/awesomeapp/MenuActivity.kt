@@ -17,6 +17,7 @@
 package com.awesomeapp.android.awesomeapp
 
 import android.content.Intent
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -33,6 +34,11 @@ open class MenuActivity : AppCompatActivity() {
         when(item?.itemId){
             R.id.account -> {
                 startActivity(Intent(this, UserActivity::class.java))
+            }
+            R.id.slack->{
+                val slackApp = Uri.parse("slack://channel?id=C94NC2CKW&team=C991Q405A-1524736492.000138")
+                val webIntent = Intent(Intent.ACTION_VIEW, slackApp)
+                startActivity(webIntent)
             }
         }
         return super.onOptionsItemSelected(item)
