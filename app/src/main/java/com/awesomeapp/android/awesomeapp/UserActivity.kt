@@ -227,6 +227,34 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateProject(project: ProjectsModel, value: Long) {
+        project.nbUsers = project.nbUsers + value
+        myDatabase.document("Projects/${project.id}").set(project).addOnSuccessListener({
+            Log.d(UserActivity::class.simpleName, "Project ${project.id} saved")
+        }).addOnFailureListener {
+            Log.d(UserActivity::class.simpleName, "Fail in Project ${project.id} saving")
+        }
+    }
+
+    private fun updateUserByLang(user: String, old: String, new: String) {
+        myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener({
+            Log.d(UserActivity::class.simpleName, "User $user deleted on $old")
+        }).addOnFailureListener {
+            Log.d(UserActivity::class.simpleName, "Fail in deletion $user on $old")
+        }
+
+        if (new != "") {
+            val userByLanguageData = HashMap<String, Any>()
+            userByLanguageData["know"] = true
+            myDatabase.collection("UsersByLanguage").document("${new}_$user").set(userByLanguageData)
+                    .addOnSuccessListener({
+                        Log.d(UserActivity::class.simpleName, "User $user saved on $new")
+                    }).addOnFailureListener {
+                        Log.d(UserActivity::class.simpleName, "Fail in saving $user on $new")
+                    }
+        }
+    }
+
     private fun deleteUser() {
 
         val currentUser = mAuth.currentUser
