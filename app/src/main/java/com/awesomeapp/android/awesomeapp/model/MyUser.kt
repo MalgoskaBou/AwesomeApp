@@ -24,7 +24,7 @@ package com.awesomeapp.android.awesomeapp.model
 class MyUser {
     var slackNick: String? = null
     var currentProject: String? = null
-    var language1: String? = null
-    var language2: String? = null
-    var track: String? = null
+    var language1: String = ""
+    var language2: String = ""
+    var track: String = ""
 }
