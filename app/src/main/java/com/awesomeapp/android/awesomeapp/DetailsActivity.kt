@@ -26,17 +26,18 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
-import com.awesomeapp.android.awesomeapp.data.Constant
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
+import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
+import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FieldPath.documentId
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
 import kotlinx.android.synthetic.main.activity_details.*
@@ -50,8 +51,8 @@ private const val HOW_MUCH_TO_CHARGE = 1L
 class DetailsActivity : MenuActivity() {
 
     private var users: ArrayList<UserModel> = ArrayList()
-    private val allUsers = ArrayList<UserModel>()
-    private val usersByLang = HashMap<String, ArrayList<UserModel>?>()
+    //    private val allUsers = ArrayList<UserModel>()
+//    private val usersByLang = HashMap<String, ArrayList<UserModel>?>()
     private var adapter = UserAdapter(users)
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
@@ -90,24 +91,33 @@ class DetailsActivity : MenuActivity() {
      * Get all the languages
      */
     private fun initialiseLanguages() {
-        myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
-            if (e != null) {
-                Log.w("error - ", e)
-                toast("Error :(")
-                return@EventListener
-            } else if (snapshots!!.exists()) {
-                @Suppress("UNCHECKED_CAST")
-                val langTable = snapshots[Constant.LANG_TABLE] as java.util.ArrayList<String>
-                langTable.sort()
-                langTable.add(0, getString(R.string.noLanguageFilter))
+        val langTable = QueryUtils.getStringLanguages()
+        langTable.add(0, getString(R.string.noLanguageFilter))
 
-                val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
-                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                languageSpinner.adapter = spinnerAdapter
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        languageSpinner.adapter = spinnerAdapter
 
-                addChangeLangListener()
-            }
-        })
+        addChangeLangListener()
+
+//        myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
+//            if (e != null) {
+//                Log.w("error - ", e)
+//                toast("Error :(")
+//                return@EventListener
+//            } else if (snapshots!!.exists()) {
+//                @Suppress("UNCHECKED_CAST")
+//                val langTable = snapshots[Constant.LANG_TABLE] as java.util.ArrayList<String>
+//                langTable.sort()
+//                langTable.add(0, getString(R.string.noLanguageFilter))
+//
+//                val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
+//                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//                languageSpinner.adapter = spinnerAdapter
+//
+//                addChangeLangListener()
+//            }
+//        })
     }
 
     /**
@@ -145,9 +155,9 @@ class DetailsActivity : MenuActivity() {
 
                     rv.removeAllViews()
                     users.add(user)
-                    allUsers.add(user)
-                    addUserByLang(user, document.get(LANGUAGE_1).toString())
-                    addUserByLang(user, document.get(LANGUAGE_2).toString())
+//                    allUsers.add(user)
+//                    addUserByLang(user, document.get(LANGUAGE_1).toString())
+//                    addUserByLang(user, document.get(LANGUAGE_2).toString())
                 }
 
                 lastVisible = snapshots.documents[snapshots.size() - 1]
@@ -170,14 +180,14 @@ class DetailsActivity : MenuActivity() {
     /**
      * Add a user in the usersByLang map
      */
-    private fun addUserByLang(user: UserModel, lang: String) {
-        var usersLang = usersByLang[lang]
-        if (usersLang == null) {
-            usersLang = ArrayList()
-        }
-        usersLang.add(user)
-        usersByLang[lang] = usersLang
-    }
+//    private fun addUserByLang(user: UserModel, lang: String) {
+//        var usersLang = usersByLang[lang]
+//        if (usersLang == null) {
+//            usersLang = ArrayList()
+//        }
+//        usersLang.add(user)
+//        usersByLang[lang] = usersLang
+//    }
 
     /**
      * Add the listener to the lang spinner
@@ -203,17 +213,59 @@ class DetailsActivity : MenuActivity() {
         // If a language is selected
         if (languageSpinner.selectedItemPosition > 0) {
             val lang = languageSpinner.selectedItem.toString()
-            // If there is users with this language
-            if (usersByLang[lang] != null && usersByLang[lang]!!.size > 0) {
-                users.addAll(usersByLang[lang]!!)
-            } else {
-                noOneWorkCurrently.visibility = View.VISIBLE
-            }
-        } else {
-            users.addAll(allUsers)
-            if (users.size == 0) {
-                noOneWorkCurrently.visibility = View.VISIBLE
-            }
+//            // If there is users with this language
+//            if (usersByLang[lang] != null && usersByLang[lang]!!.size > 0) {
+//                users.addAll(usersByLang[lang]!!)
+//            } else {
+//                noOneWorkCurrently.visibility = View.VISIBLE
+//            }
+//        } else {
+//            users.addAll(allUsers)
+//            if (users.size == 0) {
+//                noOneWorkCurrently.visibility = View.VISIBLE
+//            }
+//        }
+
+            val query = FirebaseFirestore.getInstance().collection("UsersByLanguage")
+                    .whereGreaterThanOrEqualTo(documentId(), lang)
+                    .whereLessThan(documentId(), lang + "z")
+                    .whereEqualTo("project", projectNameExtra)
+                    .limit(HOW_MUCH_TO_CHARGE)
+            query.addSnapshotListener(this, { snapshots, e ->
+                if (snapshots?.size()!! > 0) {
+                    for (document in snapshots) {
+                        Log.d(DetailsActivity::class.simpleName, "User $document.id")
+                        val userId = document.id.split("_")[1]
+                        myUsers.document(userId).get().addOnSuccessListener({
+                            Log.d(DetailsActivity::class.simpleName, "Get User ${it.id}")
+
+                            val languagesToDisplay = "${it.get(LANGUAGE)}"
+                            val user = UserModel(it.get(SLACK_NAME).toString(), languagesToDisplay)
+
+                            rv.removeAllViews()
+                            users.add(user)
+//                        allUsers.add(user)
+//                        addUserByLang(user, document.get(LANGUAGE_1).toString())
+//                        addUserByLang(user, document.get(LANGUAGE_2).toString())
+
+                        })
+                    }
+
+                    lastVisible = snapshots.documents[snapshots.size() - 1]
+
+                } else {
+                    if (users.size == 0) {
+                        noOneWorkCurrently.visibility = View.VISIBLE
+                    }
+                    toast(getString(R.string.nothingToLoad))
+                    swipeLayout.isRefreshing = false
+                    Log.e("Event ", e.toString())
+                }
+                myProgressBar?.dismiss()
+                swipeLayout.isRefreshing = false
+
+
+            })
         }
     }
 
