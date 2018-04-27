@@ -39,6 +39,7 @@ object Constant {
     const val USER_NAME = "userName"
     const val USER_EMAIL = "userEmail"
     const val SLACK_NAME = "slackName"
+    const val LANGUAGE = "language"
     const val LANGUAGE_1 = "languageFirst"
     const val LANGUAGE_2 = "languageSecond"
     const val CURRENT_PROJECT = "currentProject"

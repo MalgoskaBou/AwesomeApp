@@ -25,6 +25,7 @@ import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 /**
@@ -48,8 +49,47 @@ class QueryUtils private constructor() {
             loadLanguages()
         }
 
+        fun getTrack(track: String): TrackModel {
+            return tracks.filter { it.id == track }[0]
+        }
+
+        fun getStringTracks(): ArrayList<String> {
+            val array = ArrayList<String>()
+            for (track in tracks) {
+                array.add(track.name)
+            }
+            return array
+        }
+
         fun getProjects(track: String): ArrayList<ProjectsModel>? {
             return projects[track]
+        }
+
+        fun getProject(track: String, project: String): ProjectsModel? {
+            return projects[track]?.filter { projectsModel -> projectsModel.name == project }
+                    ?.map { it }?.get(0)
+        }
+
+        fun getStringProjects(track: String): ArrayList<String> {
+            val array = ArrayList<String>()
+            val projectsArray = projects[track] ?: return array
+
+            for (language in projectsArray) {
+                array.add(language.name)
+            }
+            return array
+        }
+
+        fun getLanguage(language: String): LanguageModel {
+            return languages.filter { it.id == language }[0]
+        }
+
+        fun getStringLanguages(): ArrayList<String> {
+            val array = ArrayList<String>()
+            for (language in languages) {
+                array.add(language.name)
+            }
+            return array
         }
 
         private fun loadTracks() {
