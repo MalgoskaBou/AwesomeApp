@@ -54,8 +54,7 @@
         app:layout_constraintStart_toEndOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:srcCompat="@drawable/ic_my_android"
-        />
+        app:srcCompat="@drawable/ic_my_android" />
 
     <TextView
         android:id="@+id/abndAndroidText"

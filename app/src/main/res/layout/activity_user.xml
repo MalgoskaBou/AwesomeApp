@@ -30,7 +30,6 @@
         style="@style/userSpinner"
         android:layout_height="@dimen/rowSize"
         android:layout_marginTop="@dimen/smallDp"
-        android:drawableEnd="@drawable/ic_drop_arrow"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/actualProjectTxt" />
