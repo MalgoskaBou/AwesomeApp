@@ -16,8 +16,11 @@
 
 package com.awesomeapp.android.awesomeapp.model
 
-import java.util.*
+/**
+ * Created by Fabien Boismoreau on 27/04/2018.
+ * <p>
+ */
 
-data class ProjectsModel(var id: String, var name: String, var deadline: Date, var nbUsers: Long, var order: Long) {
-    constructor() : this("", "", Date(), 0, 0)
+data class TrackModel(var id: String, var name: String) {
+    constructor() : this("", "")
 }

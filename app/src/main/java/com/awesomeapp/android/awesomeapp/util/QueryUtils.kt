@@ -18,7 +18,12 @@ package com.awesomeapp.android.awesomeapp.util
 
 import android.util.Log
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
+import com.awesomeapp.android.awesomeapp.model.TrackModel
+import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import java.util.*
 
 
 /**
@@ -29,9 +34,8 @@ class QueryUtils private constructor() {
 
     companion object {
 
-        val tracks = ArrayList<String>()
+        val tracks = ArrayList<TrackModel>()
         val projects = HashMap<String, ArrayList<ProjectsModel>>()
-        var projectsLoaded = false
 
         /**
          * Initialise the generic data
@@ -43,45 +47,90 @@ class QueryUtils private constructor() {
 
         }
 
-        fun getProjects(track: String): ArrayList<ProjectsModel> {
-            return projects[track]!!
+        fun getProjects(track: String): ArrayList<ProjectsModel>? {
+            return projects[track]
         }
 
         private fun loadTracks() {
             val tracksCollection = FirebaseFirestore.getInstance().collection("Tracks")
 
-            tracksCollection.get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    for (track in it.result) {
-                        Log.d(QueryUtils::class.simpleName, track.id + " => " + track.data)
-                        tracks.add(track.get("name") as String)
-                    }
-                } else {
-                    Log.d(QueryUtils::class.simpleName, "Error getting tracks: ", it.exception)
+            tracksCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
+                if (e != null) {
+                    Log.w(QueryUtils::class.simpleName, "listen:error", e);
+                    return@EventListener
                 }
-            }
+
+                if (snapshots == null) return@EventListener
+
+                for (dc in snapshots.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            Log.d(QueryUtils::class.simpleName, "New track: " + dc.document.data)
+                            //var trackModel = TrackModel(dc.document.id)
+                            val trackModel = dc.document.toObject(TrackModel::class.java).copy()
+                            trackModel.id = dc.document.id
+                            tracks.add(trackModel)
+                        }
+
+                        DocumentChange.Type.MODIFIED -> {
+                            Log.d(QueryUtils::class.simpleName, "Modified track: " + dc.document.data)
+                            val track = tracks.filter { it.id == dc.document.id }[0]
+                            track.name = dc.document.data["name"] as String
+                        }
+                        DocumentChange.Type.REMOVED -> {
+                            Log.d(QueryUtils::class.simpleName, "Removed track: " + dc.document.data)
+                            val track = tracks.filter { it.id == dc.document.id }[0]
+                            tracks.removeAt(tracks.indexOf(track))
+                        }
+                    }
+                }
+            })
         }
 
         private fun loadProjects() {
             val projectsCollection = FirebaseFirestore.getInstance().collection("Projects")
 
-            projectsCollection.get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    for (project in it.result) {
-                        Log.d(QueryUtils::class.simpleName, project.id + " => " + project.data)
-                        val projectObj = project.toObject(ProjectsModel::class.java)
-                        Log.d(QueryUtils::class.simpleName, "Obj => $projectObj")
-
-                        val track = project.id.split("_")[0]
-                        val projectsByTrack = projects[track] ?: ArrayList()
-                        projectsByTrack.add(projectObj)
-                        projects[track] = projectsByTrack
-                    }
-                    projectsLoaded = true
-                } else {
-                    Log.d(QueryUtils::class.simpleName, "Error getting projects: ", it.exception)
+            //projectsCollection.get().addOnCompleteListener {
+            projectsCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
+                if (e != null) {
+                    Log.w(QueryUtils::class.simpleName, "listen:error", e);
+                    return@EventListener
                 }
-            }
+
+                if (snapshots == null) return@EventListener
+
+                for (dc in snapshots.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            Log.d(QueryUtils::class.simpleName, "New project: " + dc.document.data)
+                            val projectObj = dc.document.toObject(ProjectsModel::class.java)
+                            projectObj.id = dc.document.id
+                            val track = dc.document.id.split("_")[0]
+                            val projectsByTrack = projects[track] ?: ArrayList()
+                            projectsByTrack.add(projectObj)
+                            projects[track] = projectsByTrack
+                        }
+
+                        DocumentChange.Type.MODIFIED -> {
+                            Log.d(QueryUtils::class.simpleName, "Modified project: " + dc.document.data)
+                            val track = dc.document.id.split("_")[0]
+                            val projectsByTrack = projects[track]
+                            val project = projectsByTrack!!.filter { it.id == dc.document.id }[0]
+                            project.name = dc.document.data["name"] as String
+                            project.deadline = dc.document.data["deadline"] as Date
+                            project.nbUsers = dc.document.data["nbUsers"] as Long
+                            project.order = dc.document.data["order"] as Long
+                        }
+                        DocumentChange.Type.REMOVED -> {
+                            Log.d(QueryUtils::class.simpleName, "Removed project: " + dc.document.data)
+                            val track = dc.document.id.split("_")[0]
+                            val projectsByTrack = projects[track]
+                            val project = projectsByTrack!!.filter { it.id == dc.document.id }[0]
+                            projectsByTrack.removeAt(projectsByTrack.indexOf(project))
+                        }
+                    }
+                }
+            })
         }
 
     }
