@@ -17,6 +17,7 @@
 package com.awesomeapp.android.awesomeapp.util
 
 import android.util.Log
+import com.awesomeapp.android.awesomeapp.model.LanguageModel
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.TrackModel
 import com.google.firebase.firestore.DocumentChange
@@ -36,15 +37,15 @@ class QueryUtils private constructor() {
 
         val tracks = ArrayList<TrackModel>()
         val projects = HashMap<String, ArrayList<ProjectsModel>>()
+        val languages = ArrayList<LanguageModel>()
 
         /**
          * Initialise the generic data
          */
         fun initialiseDBData() {
-
             loadTracks()
             loadProjects()
-
+            loadLanguages()
         }
 
         fun getProjects(track: String): ArrayList<ProjectsModel>? {
@@ -56,7 +57,7 @@ class QueryUtils private constructor() {
 
             tracksCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
                 if (e != null) {
-                    Log.w(QueryUtils::class.simpleName, "listen:error", e);
+                    Log.w(QueryUtils::class.simpleName, "listen:error", e)
                     return@EventListener
                 }
 
@@ -66,7 +67,6 @@ class QueryUtils private constructor() {
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> {
                             Log.d(QueryUtils::class.simpleName, "New track: " + dc.document.data)
-                            //var trackModel = TrackModel(dc.document.id)
                             val trackModel = dc.document.toObject(TrackModel::class.java).copy()
                             trackModel.id = dc.document.id
                             tracks.add(trackModel)
@@ -90,10 +90,9 @@ class QueryUtils private constructor() {
         private fun loadProjects() {
             val projectsCollection = FirebaseFirestore.getInstance().collection("Projects")
 
-            //projectsCollection.get().addOnCompleteListener {
             projectsCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
                 if (e != null) {
-                    Log.w(QueryUtils::class.simpleName, "listen:error", e);
+                    Log.w(QueryUtils::class.simpleName, "listen:error", e)
                     return@EventListener
                 }
 
@@ -133,5 +132,39 @@ class QueryUtils private constructor() {
             })
         }
 
+        private fun loadLanguages() {
+            val languageCollection = FirebaseFirestore.getInstance().collection("Languages")
+
+            languageCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
+                if (e != null) {
+                    Log.w(QueryUtils::class.simpleName, "listen:error", e)
+                    return@EventListener
+                }
+
+                if (snapshots == null) return@EventListener
+
+                for (dc in snapshots.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            Log.d(QueryUtils::class.simpleName, "New language: " + dc.document.data)
+                            val languageModel = dc.document.toObject(LanguageModel::class.java).copy()
+                            languageModel.id = dc.document.id
+                            languages.add(languageModel)
+                        }
+
+                        DocumentChange.Type.MODIFIED -> {
+                            Log.d(QueryUtils::class.simpleName, "Modified language: " + dc.document.data)
+                            val language = languages.filter { it.id == dc.document.id }[0]
+                            language.name = dc.document.data["name"] as String
+                        }
+                        DocumentChange.Type.REMOVED -> {
+                            Log.d(QueryUtils::class.simpleName, "Removed language: " + dc.document.data)
+                            val language = languages.filter { it.id == dc.document.id }[0]
+                            languages.removeAt(languages.indexOf(language))
+                        }
+                    }
+                }
+            })
+        }
     }
 }
