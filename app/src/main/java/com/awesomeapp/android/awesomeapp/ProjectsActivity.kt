@@ -46,7 +46,8 @@ class ProjectsActivity : MenuActivity() {
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
-        val projects = QueryUtils.getProjects(track)
+        val projects = QueryUtils.getProjects(track) ?: ArrayList()
+
         val adapter = ProjectsAdapter(projects, this, track)
 
         rv.adapter = adapter
