@@ -236,7 +236,7 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUserByLang(user: String, old: String, new: String) {
+    private fun updateUserByLang(user: String, project: String, old: String, new: String) {
         myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener({
             Log.d(UserActivity::class.simpleName, "User $user deleted on $old")
         }).addOnFailureListener {
@@ -245,7 +245,7 @@ class UserActivity : AppCompatActivity() {
 
         if (new != "") {
             val userByLanguageData = HashMap<String, Any>()
-            userByLanguageData["know"] = true
+            userByLanguageData["project"] = project
             myDatabase.collection("UsersByLanguage").document("${new}_$user").set(userByLanguageData)
                     .addOnSuccessListener({
                         Log.d(UserActivity::class.simpleName, "User $user saved on $new")

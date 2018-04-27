@@ -32,7 +32,6 @@ import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
 import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.myHelpData
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
