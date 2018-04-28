@@ -62,6 +62,7 @@
     <string name="userDeleted">User deleted successfully</string>
     <string name="ok">OK</string>
     <string name="chooseMessage">Choose your track and current project</string>
+    <string name="waitingMessage">Wait for data loading</string>
 
 
 </resources>

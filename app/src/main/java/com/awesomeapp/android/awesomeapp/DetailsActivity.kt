@@ -64,7 +64,7 @@ class DetailsActivity : MenuActivity() {
 
         projectNameTxt.text = projectNameExtra
         noOneWorkCurrently.visibility = View.GONE
-        myProgressBar = indeterminateProgressDialog("Wait for data loading")
+        myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
         myProgressBar?.show()
 
         rv = findViewById(R.id.usersList)
