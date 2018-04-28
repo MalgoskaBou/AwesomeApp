@@ -53,6 +53,7 @@ class DetailsActivity : MenuActivity() {
     private lateinit var rv: RecyclerView
     private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout
+    private var isLoading = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,6 +100,7 @@ class DetailsActivity : MenuActivity() {
      * Load the users currently working on the selected project
      */
     private fun loadUsers() {
+        isLoading = true
         val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).limit(HOW_MUCH_TO_CHARGE)
         getUsers(query)
     }
@@ -108,10 +110,22 @@ class DetailsActivity : MenuActivity() {
      */
     private fun loadMoreUsers() {
         if (lastVisible != null) {
-            //Remove the filter
-            languageSpinner.setSelection(0)
-            val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).startAfter(lastVisible!!).limit(HOW_MUCH_TO_CHARGE)
-            getUsers(newQuery)
+
+            if (languageSpinner.selectedItemPosition > 0) {
+                val lang = languageSpinner.selectedItem.toString()
+
+                val query = FirebaseFirestore.getInstance().collection("UsersByLanguage")
+                        .whereGreaterThanOrEqualTo(documentId(), lang)
+                        .whereLessThan(documentId(), lang + "a")
+                        .whereEqualTo("project", projectNameExtra)
+                        .startAfter(lastVisible!!)
+                        .limit(HOW_MUCH_TO_CHARGE)
+
+                getUsersFiltered(query)
+            } else {
+                val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).startAfter(lastVisible!!).limit(HOW_MUCH_TO_CHARGE)
+                getUsers(newQuery)
+            }
         } else {
             toast(getString(R.string.nothingToLoad))
             swipeLayout.isRefreshing = false
@@ -125,27 +139,61 @@ class DetailsActivity : MenuActivity() {
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
                 for (document in snapshots) {
-                    // TODO correct
-                    val user = UserModel() //UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay)
+                    val user = document.toObject(UserModel::class.java)
 
                     rv.removeAllViews()
                     users.add(user)
                 }
 
                 lastVisible = snapshots.documents[snapshots.size() - 1]
-
+                isLoading = false
             } else {
+                toast(getString(R.string.nothingToLoad))
+                swipeLayout.isRefreshing = false
+                Log.e("Event ", e.toString())
+                isLoading = false
+            }
+            myProgressBar?.dismiss()
+            swipeLayout.isRefreshing = false
+
+            if (users.size == 0) {
+                noOneWorkCurrently.visibility = View.VISIBLE
+            }
+        })
+    }
+
+    /**
+     * Get the users from the database filtered by language
+     */
+    private fun getUsersFiltered(query: Query) {
+        query.addSnapshotListener(this, { snapshots, e ->
+            if (snapshots?.size()!! > 0) {
+                for (document in snapshots) {
+                    Log.d(DetailsActivity::class.simpleName, "User $document.id")
+                    val userId = document.id.split("_")[1]
+
+                    myUsers.document(userId).get().addOnSuccessListener({
+                        Log.d(DetailsActivity::class.simpleName, "Get User ${it.id}")
+
+                        val user = it.toObject(UserModel::class.java)
+
+                        user ?: return@addOnSuccessListener
+
+                        rv.removeAllViews()
+                        users.add(user)
+                    })
+                }
+                lastVisible = snapshots.documents[snapshots.size() - 1]
+            } else {
+                if (users.size == 0) {
+                    noOneWorkCurrently.visibility = View.VISIBLE
+                }
                 toast(getString(R.string.nothingToLoad))
                 swipeLayout.isRefreshing = false
                 Log.e("Event ", e.toString())
             }
             myProgressBar?.dismiss()
             swipeLayout.isRefreshing = false
-
-
-            if (users.size == 0) {
-                noOneWorkCurrently.visibility = View.VISIBLE
-            }
         })
     }
 
@@ -168,7 +216,9 @@ class DetailsActivity : MenuActivity() {
      * Filter users on lang
      */
     private fun filter() {
-        clearUsers()
+        if (!isLoading) {
+            clearUsers()
+        }
 
         // If a language is selected
         if (languageSpinner.selectedItemPosition > 0) {
@@ -176,40 +226,13 @@ class DetailsActivity : MenuActivity() {
 
             val query = FirebaseFirestore.getInstance().collection("UsersByLanguage")
                     .whereGreaterThanOrEqualTo(documentId(), lang)
-                    .whereLessThan(documentId(), lang + "z")
+                    .whereLessThan(documentId(), lang + "a")
                     .whereEqualTo("project", projectNameExtra)
                     .limit(HOW_MUCH_TO_CHARGE)
-            query.addSnapshotListener(this, { snapshots, e ->
-                if (snapshots?.size()!! > 0) {
-                    for (document in snapshots) {
-                        Log.d(DetailsActivity::class.simpleName, "User $document.id")
-                        val userId = document.id.split("_")[1]
-                        myUsers.document(userId).get().addOnSuccessListener({
-                            Log.d(DetailsActivity::class.simpleName, "Get User ${it.id}")
 
-                            // TODO correct
-                            val user = UserModel()//UserModel(it.get(SLACK_NAME).toString(), languagesToDisplay)
-
-                            rv.removeAllViews()
-                            users.add(user)
-                        })
-                    }
-
-                    lastVisible = snapshots.documents[snapshots.size() - 1]
-
-                } else {
-                    if (users.size == 0) {
-                        noOneWorkCurrently.visibility = View.VISIBLE
-                    }
-                    toast(getString(R.string.nothingToLoad))
-                    swipeLayout.isRefreshing = false
-                    Log.e("Event ", e.toString())
-                }
-                myProgressBar?.dismiss()
-                swipeLayout.isRefreshing = false
-
-
-            })
+            getUsersFiltered(query)
+        } else {
+            loadUsers()
         }
     }
 
