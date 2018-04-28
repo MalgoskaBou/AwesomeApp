@@ -24,13 +24,17 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="MyEditTextStyle2" parent="Widget.AppCompat.EditText">
+
+    <!-- User editText. -->
+    <style name="MyEditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="colorControlActivated">@color/colorPrimaryDark</item>
         <item name="colorControlNormal">@color/colorPrimaryDark</item>
-
         <item name="android:layout_marginStart">50dp</item>
+        <item name="android:ems">10</item>
+        <item name="android:inputType">textPersonName</item>
     </style>
 
+    <!-- User spinners normal. -->
     <style name="userInput" parent="AppTheme">
         <item name="android:layout_marginBottom">@dimen/mediumDp</item>
         <item name="android:layout_marginStart">@dimen/mediumDp</item>
@@ -45,16 +49,31 @@
         <item name="android:layout_height">@dimen/spinnerHeight</item>
     </style>
 
-    <style name="userText" parent="AppTheme">
+    <!--For text-->
+    <style name="forText" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/greyTextColor</item>
+    </style>
+    
+    <style name="bigText" parent="forText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/bigText</item>
+    </style>
+
+    <style name="smallText" parent="forText">
+        <item name="android:textSize">@dimen/normalText</item>
+    </style>
+
+    <!-- User labels. -->
+    <style name="userText" parent="smallText">
         <item name="android:layout_marginStart">@dimen/mediumDp</item>
         <item name="android:layout_marginEnd">@dimen/mediumDp</item>
         <item name="android:layout_marginBottom">@dimen/smallDp</item>
         <item name="android:layout_marginTop">@dimen/smallDp</item>
     </style>
 
+    <!-- User button with background. -->
     <style name="buttonUser" parent="AppTheme">
         <item name="android:layout_marginTop">@dimen/smallDp</item>
         <item name="android:layout_marginBottom">@dimen/smallDp</item>
@@ -64,5 +83,36 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
+    <!-- User button without background. -->
+    <style name="buttonUserWB" parent="AppTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@null</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginTop">@dimen/smallDp</item>
+        <item name="android:layout_marginEnd">@dimen/smallDp</item>
+    </style>
+
+    <!-- Main big buttons with tracks - MAIN ACTIVITY. -->
+    <style name="tracksButtons" parent="AppTheme">
+        <item name="android:layout_height">@dimen/wrapConstraint</item>
+        <item name="android:layout_width">@dimen/wrapConstraint</item>
+        <item name="android:layout_margin">@dimen/mediumDp</item>
+        <item name="android:background">@drawable/background_frame_bold</item>
+        <item name="android:paddingBottom">@dimen/hugePaddingMA</item>
+        <item name="android:paddingTop">@dimen/bigPaddingMA</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="trackButtonLabels" parent="userText">
+        <item name="android:textSize"> @dimen/normalText</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_marginBottom">@dimen/mediumDp</item>
+    </style>
+
+
 
 </resources>

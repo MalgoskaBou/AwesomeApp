@@ -22,6 +22,16 @@
 
     <dimen name="wrapConstraint">0dp</dimen>
     <dimen name="spinnerHeight">40dp</dimen>
-    <dimen name="bigSpinnerHeight">60dp</dimen>
+    <dimen name="rowSize">60dp</dimen>
+
+    <dimen name="bigText">18sp</dimen>
+    <dimen name="normalText">14sp</dimen>
+
+    <dimen name="bigPaddingMA">40dp</dimen>
+    <dimen name="hugePaddingMA">70dp</dimen>
+
+    <dimen name="mediumMargin">24dp</dimen>
+    <dimen name="bigMargin">34dp</dimen>
+
 
 </resources>

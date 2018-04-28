@@ -22,7 +22,7 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/myToolbar"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/wrapConstraint"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
