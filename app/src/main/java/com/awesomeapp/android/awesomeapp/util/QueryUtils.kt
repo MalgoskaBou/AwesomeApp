@@ -36,9 +36,9 @@ class QueryUtils private constructor() {
 
     companion object {
 
-        val tracks = ArrayList<TrackModel>()
-        val projects = HashMap<String, ArrayList<ProjectsModel>>()
-        val languages = ArrayList<LanguageModel>()
+        private val tracks = ArrayList<TrackModel>()
+        private val projects = HashMap<String, ArrayList<ProjectsModel>>()
+        private val languages = ArrayList<LanguageModel>()
 
         /**
          * Initialise the generic data
