@@ -55,7 +55,6 @@ class UserActivity : AppCompatActivity() {
     private lateinit var mAuth: FirebaseAuth
     private lateinit var myDatabase: FirebaseFirestore
     private lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
-    private lateinit var myHelpData: DocumentReference
     private lateinit var myUserData: DocumentReference
 
     //get user data from user panel
@@ -78,9 +77,6 @@ class UserActivity : AppCompatActivity() {
 
         //get database hook
         myDatabase = FirebaseFirestore.getInstance()
-        //get helpData->tracks document
-        //myHelpData = myDatabase.document("helpData/tracks")
-        //get access to users data
         mAuth = FirebaseAuth.getInstance()
 
         // Set the listeners
@@ -95,7 +91,7 @@ class UserActivity : AppCompatActivity() {
             }
         }
 
-        //Fill DATA FROM DATABASE
+        //Fill spinner
         fillData()
 
         //DATABASE LOG IN -
@@ -105,18 +101,19 @@ class UserActivity : AppCompatActivity() {
         saveBtn.setOnClickListener { _ ->
             saveUser()
         }
+
         logOutBtn.setOnClickListener { _ ->
 
-            alert("are you sure that you want log out?") {
-                title = "Log out"
+            alert(getString(R.string.logoutConfirmation)) {
+                title = getString(R.string.logout)
                 yesButton { logOutUser() }
                 noButton { }
             }.show()
         }
 
         deleteUserButton.setOnClickListener {
-            alert("are you sure that you want delete your account?") {
-                title = "Delete account"
+            alert(getString(R.string.deleteConfirmation)) {
+                title = getString(R.string.deleteAccount)
                 yesButton { deleteUser() }
                 noButton { }
             }.show()
@@ -129,9 +126,9 @@ class UserActivity : AppCompatActivity() {
 
             mAuth.currentUser?.sendEmailVerification()
 
-            alert("Verificate your email") {
-                positiveButton("Send me link") { mAuth.currentUser?.sendEmailVerification() }
-                negativeButton("Refresh") { mAuth.currentUser?.reload() }
+            alert(getString(R.string.verifyEmail)) {
+                positiveButton(getString(R.string.sendLink)) { mAuth.currentUser?.sendEmailVerification() }
+                negativeButton(getString(R.string.refresh)) { mAuth.currentUser?.reload() }
 
             }.show()
         }
@@ -144,7 +141,7 @@ class UserActivity : AppCompatActivity() {
         userData[USER_NAME] = userName
         userData[USER_EMAIL] = userEmail
         if (slackNick.text == null || slackNick.text.toString().trim() == "")
-            userData[SLACK_NAME] = "undefined"
+            userData[SLACK_NAME] = getString(R.string.undefined)
         else
             userData[SLACK_NAME] = slackNick.text.toString()
 
@@ -178,7 +175,7 @@ class UserActivity : AppCompatActivity() {
 
         //put userdata to database (path to myUserdata is declared in userLogIn function)
         myUserData.set(userData).addOnSuccessListener({
-            Toast.makeText(this@UserActivity, "Data saved", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@UserActivity, getString(R.string.dataSaved), Toast.LENGTH_SHORT).show()
 
             if (newProject?.id ?: "" != oldProject?.id ?: "") {
                 if (oldProject != null) {
@@ -198,7 +195,7 @@ class UserActivity : AppCompatActivity() {
             }
 
         }).addOnFailureListener {
-            Toast.makeText(this@UserActivity, "Something wrong :( try again", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@UserActivity, getString(R.string.somethingWrong), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -255,7 +252,7 @@ class UserActivity : AppCompatActivity() {
                                         currentUser.delete().addOnCompleteListener { task ->
                                             if (task.isSuccessful) {
 
-                                                toast("User deleted successfully")
+                                                toast(getString(R.string.userDeleted))
                                                 //Delete data from database
 
                                                 //Decrease nbUser of the project
@@ -274,7 +271,7 @@ class UserActivity : AppCompatActivity() {
                                             } else {
 
                                                 alert(getString(R.string.log_out_message_for_delete_user)) {
-                                                    positiveButton("OK") { }
+                                                    positiveButton(getString(R.string.ok)) { }
                                                 }.show()
 
                                                 Log.e("usun usera ", "${task.exception}")
@@ -347,7 +344,7 @@ class UserActivity : AppCompatActivity() {
 
                 updateUserData()
             } else {
-                toast("Choose your patch and current project")
+                toast(getString(R.string.chooseMessage))
                 saveUser()
             }
         })

@@ -49,6 +49,19 @@
     <string name="log_out_message_for_delete_user">for security reasons you have to log out and log in again to delete your account correctly</string>
     <string name="open_slack">Open Slack</string>
     <string name="slack">Open slack</string>
+    <string name="logoutConfirmation">are you sure that you want log out?</string>
+    <string name="logout">Log out</string>
+    <string name="deleteConfirmation">are you sure that you want delete your account?</string>
+    <string name="deleteAccount">Delete account</string>
+    <string name="verifyEmail">Verify your email</string>
+    <string name="sendLink">Send me link</string>
+    <string name="refresh">Refresh</string>
+    <string name="undefined">undefined</string>
+    <string name="dataSaved">Data saved</string>
+    <string name="somethingWrong">Something wrong :( try again</string>
+    <string name="userDeleted">User deleted successfully</string>
+    <string name="ok">OK</string>
+    <string name="chooseMessage">Choose your track and current project</string>
 
 
 </resources>
