@@ -29,6 +29,8 @@ import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_TRACT
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import kotlinx.android.synthetic.main.activity_details.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val context: Context
                       , private val whichTrack: String) : RecyclerView.Adapter<ProjectsAdapter.ViewHolder>() {
@@ -43,8 +45,11 @@ class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val co
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val dateFormatter = SimpleDateFormat("MMM d yyyy", Locale.getDefault())
+        val formatedData = "Deadline: ${dateFormatter.format(projectsList[position].deadline).toUpperCase()}"
+
         holder.projectNameTxt?.text = projectsList[position].name
-        holder.deadLineTxt?.text = projectsList[position].deadline.toString()
+        holder.deadLineTxt?.text = formatedData
         holder.percentOfUsersTxt?.text = projectsList[position].nbUsers.toString()
 
         val intentToDetails = Intent(context, DetailsActivity::class.java)
