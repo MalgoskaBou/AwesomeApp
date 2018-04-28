@@ -47,8 +47,6 @@ private const val HOW_MUCH_TO_CHARGE = 1L
 class DetailsActivity : MenuActivity() {
 
     private var users: ArrayList<UserModel> = ArrayList()
-    //    private val allUsers = ArrayList<UserModel>()
-//    private val usersByLang = HashMap<String, ArrayList<UserModel>?>()
     private var adapter = UserAdapter(users)
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
@@ -95,25 +93,6 @@ class DetailsActivity : MenuActivity() {
         languageSpinner.adapter = spinnerAdapter
 
         addChangeLangListener()
-
-//        myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
-//            if (e != null) {
-//                Log.w("error - ", e)
-//                toast("Error :(")
-//                return@EventListener
-//            } else if (snapshots!!.exists()) {
-//                @Suppress("UNCHECKED_CAST")
-//                val langTable = snapshots[Constant.LANG_TABLE] as java.util.ArrayList<String>
-//                langTable.sort()
-//                langTable.add(0, getString(R.string.noLanguageFilter))
-//
-//                val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
-//                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-//                languageSpinner.adapter = spinnerAdapter
-//
-//                addChangeLangListener()
-//            }
-//        })
     }
 
     /**
@@ -146,15 +125,11 @@ class DetailsActivity : MenuActivity() {
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
                 for (document in snapshots) {
-                    //val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
                     // TODO correct
                     val user = UserModel() //UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay)
 
                     rv.removeAllViews()
                     users.add(user)
-//                    allUsers.add(user)
-//                    addUserByLang(user, document.get(LANGUAGE_1).toString())
-//                    addUserByLang(user, document.get(LANGUAGE_2).toString())
                 }
 
                 lastVisible = snapshots.documents[snapshots.size() - 1]
@@ -173,18 +148,6 @@ class DetailsActivity : MenuActivity() {
             }
         })
     }
-
-    /**
-     * Add a user in the usersByLang map
-     */
-//    private fun addUserByLang(user: UserModel, lang: String) {
-//        var usersLang = usersByLang[lang]
-//        if (usersLang == null) {
-//            usersLang = ArrayList()
-//        }
-//        usersLang.add(user)
-//        usersByLang[lang] = usersLang
-//    }
 
     /**
      * Add the listener to the lang spinner
@@ -210,18 +173,6 @@ class DetailsActivity : MenuActivity() {
         // If a language is selected
         if (languageSpinner.selectedItemPosition > 0) {
             val lang = languageSpinner.selectedItem.toString()
-//            // If there is users with this language
-//            if (usersByLang[lang] != null && usersByLang[lang]!!.size > 0) {
-//                users.addAll(usersByLang[lang]!!)
-//            } else {
-//                noOneWorkCurrently.visibility = View.VISIBLE
-//            }
-//        } else {
-//            users.addAll(allUsers)
-//            if (users.size == 0) {
-//                noOneWorkCurrently.visibility = View.VISIBLE
-//            }
-//        }
 
             val query = FirebaseFirestore.getInstance().collection("UsersByLanguage")
                     .whereGreaterThanOrEqualTo(documentId(), lang)
@@ -236,16 +187,11 @@ class DetailsActivity : MenuActivity() {
                         myUsers.document(userId).get().addOnSuccessListener({
                             Log.d(DetailsActivity::class.simpleName, "Get User ${it.id}")
 
-                            //val languagesToDisplay = "${it.get(LANGUAGE)}"
                             // TODO correct
                             val user = UserModel()//UserModel(it.get(SLACK_NAME).toString(), languagesToDisplay)
 
                             rv.removeAllViews()
                             users.add(user)
-//                        allUsers.add(user)
-//                        addUserByLang(user, document.get(LANGUAGE_1).toString())
-//                        addUserByLang(user, document.get(LANGUAGE_2).toString())
-
                         })
                     }
 
