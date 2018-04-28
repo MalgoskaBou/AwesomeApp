@@ -43,6 +43,7 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+import org.jetbrains.anko.startActivity
 
 
 private const val HOW_MUCH_TO_CHARGE = 1L
@@ -84,6 +85,7 @@ class DetailsActivity : MenuActivity() {
         swipeLayout.setOnRefreshListener({
             loadMoreUsers()
         })
+
     }
 
     /**

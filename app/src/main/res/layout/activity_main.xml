@@ -27,14 +27,9 @@
 
     <ImageButton
         android:id="@+id/andAndroid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/mediumDp"
-        android:background="@drawable/background_frame_bold"
+        style="@style/tracksButtons"
+
         android:contentDescription="@string/andTrack"
-        android:paddingBottom="70dp"
-        android:paddingTop="40dp"
-        android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,55 +38,38 @@
 
    <TextView
        android:id="@+id/andAndroidText"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_marginBottom="16dp"
+       style="@style/trackButtonLabels"
+
        android:text="@string/and"
-       android:textSize="18sp"
-       android:textStyle="bold"
        app:layout_constraintBottom_toBottomOf="@+id/andAndroid"
        app:layout_constraintEnd_toEndOf="@+id/andAndroid"
        app:layout_constraintStart_toStartOf="@+id/andAndroid" />
 
-
     <ImageButton
         android:id="@+id/abndAndroid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/background_frame_bold"
+        style="@style/tracksButtons"
+
         android:contentDescription="@string/abndTrack"
-        android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintStart_toEndOf="@+id/guideline2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:srcCompat="@drawable/ic_my_android"
-        android:layout_margin="@dimen/mediumDp"
-        android:paddingTop="40dp"
-        android:paddingBottom="70dp"/>
+        app:srcCompat="@drawable/ic_my_android" />
 
     <TextView
         android:id="@+id/abndAndroidText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        style="@style/trackButtonLabels"
+
         android:text="@string/abnd"
-        android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/abndAndroid"
         app:layout_constraintEnd_toEndOf="@+id/abndAndroid"
         app:layout_constraintStart_toStartOf="@+id/abndAndroid" />
 
     <ImageButton
         android:id="@+id/fendAndroid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/mediumDp"
+        style="@style/tracksButtons"
+
         android:contentDescription="@string/fendTrack"
-        android:background="@drawable/background_frame_bold"
-        android:paddingBottom="70dp"
-        android:paddingTop="40dp"
-        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"
@@ -100,28 +78,18 @@
 
     <TextView
         android:id="@+id/fendAndroidText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        style="@style/trackButtonLabels"
+
         android:text="@string/fend"
-        android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/fendAndroid"
         app:layout_constraintEnd_toEndOf="@+id/fendAndroid"
         app:layout_constraintStart_toStartOf="@+id/fendAndroid" />
 
     <ImageButton
         android:id="@+id/mwsAndroid"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/mediumDp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        style="@style/tracksButtons"
+
         android:contentDescription="@string/mwsTrack"
-        android:background="@drawable/background_frame_bold"
-        android:paddingBottom="70dp"
-        android:paddingTop="40dp"
-        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
@@ -130,16 +98,12 @@
 
     <TextView
         android:id="@+id/mwsAndroidText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        style="@style/trackButtonLabels"
+
         android:text="@string/mws"
-        android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/mwsAndroid"
         app:layout_constraintEnd_toEndOf="@+id/mwsAndroid"
         app:layout_constraintStart_toStartOf="@+id/mwsAndroid" />
-
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
@@ -154,8 +118,5 @@
        android:layout_height="wrap_content"
        android:orientation="vertical"
        app:layout_constraintGuide_percent="0.5" />
-
-
-
 
 </android.support.constraint.ConstraintLayout>

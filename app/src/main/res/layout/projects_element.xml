@@ -24,42 +24,37 @@
 
     <TextView
         android:id="@+id/projectNameTxt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
+        style="@style/bigText"
+        android:layout_width="@dimen/wrapConstraint"
+        android:layout_marginEnd="@dimen/mediumMargin"
+        android:layout_marginStart="@dimen/mediumMargin"
+        android:layout_marginTop="@dimen/smallDp"
         android:text="@string/testString"
-        android:textSize="18sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/deadLineTxt"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="24dp"
+        style="@style/smallText"
+        android:layout_width="@dimen/wrapConstraint"
+        android:layout_marginBottom="@dimen/smallDp"
+        android:layout_marginStart="@dimen/mediumMargin"
         android:text="@string/testString"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/percentOfUsersTxt"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/projectNameTxt" />
 
     <TextView
         android:id="@+id/percentOfUsersTxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginStart="8dp"
+        style="@style/smallText"
+        android:layout_marginBottom="@dimen/smallDp"
+        android:layout_marginEnd="@dimen/mediumMargin"
+        android:layout_marginStart="@dimen/smallDp"
         android:text="@string/testString"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/deadLineTxt"
         app:layout_constraintTop_toBottomOf="@+id/projectNameTxt" />
 </android.support.constraint.ConstraintLayout>
