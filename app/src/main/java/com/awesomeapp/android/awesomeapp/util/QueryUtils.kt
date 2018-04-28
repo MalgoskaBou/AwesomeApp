@@ -39,14 +39,18 @@ class QueryUtils private constructor() {
         private val tracks = ArrayList<TrackModel>()
         private val projects = HashMap<String, ArrayList<ProjectsModel>>()
         private val languages = ArrayList<LanguageModel>()
+        private var isLoaded = false
 
         /**
          * Initialise the generic data
          */
         fun initialiseDBData() {
-            loadTracks()
-            loadProjects()
-            loadLanguages()
+            if (!isLoaded) {
+                loadTracks()
+                loadProjects()
+                loadLanguages()
+                isLoaded = true
+            }
         }
 
         fun getTrack(track: String): TrackModel {

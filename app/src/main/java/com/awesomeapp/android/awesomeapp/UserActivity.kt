@@ -24,14 +24,9 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
-import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
-import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
-import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
-import com.awesomeapp.android.awesomeapp.model.MyUser
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
+import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.EmailAuthProvider
@@ -62,7 +57,7 @@ class UserActivity : AppCompatActivity() {
     private lateinit var userEmail: String
     private lateinit var userUid: String
 
-    private val myUser: MyUser = MyUser()
+    private var myUser: UserModel = UserModel()
 
     //spinner adapters
     private lateinit var spinnerAdapterTracks: ArrayAdapter<String>
@@ -136,14 +131,22 @@ class UserActivity : AppCompatActivity() {
 
     private fun saveUser() {
 
+        // Get old values
+        val oldLang1 = myUser.getLanguage(0)
+        val oldLang2 = myUser.getLanguage(1)
+        val oldProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
+
         //create hashMap with necessary user data what I want to put to database
-        val userData = HashMap<String, Any>()
-        userData[USER_NAME] = userName
-        userData[USER_EMAIL] = userEmail
-        if (slackNick.text == null || slackNick.text.toString().trim() == "")
-            userData[SLACK_NAME] = getString(R.string.undefined)
-        else
-            userData[SLACK_NAME] = slackNick.text.toString()
+//        val userData = HashMap<String, Any>()
+//        userData[USER_NAME] = userName
+//        userData[USER_EMAIL] = userEmail
+        if (slackNick.text == null || slackNick.text.toString().trim() == "") {
+//            userData[SLACK_NAME] = getString(R.string.undefined)
+            myUser.slackName = getString(R.string.undefined)
+        } else {
+//            userData[SLACK_NAME] = slackNick.text.toString()
+            myUser.slackName = slackNick.text.toString()
+        }
 
         var lang1 = ""
         var lang2 = ""
@@ -154,44 +157,51 @@ class UserActivity : AppCompatActivity() {
         if (lang2Spinner.selectedItemPosition > 0) {
             lang2 = lang2Spinner.selectedItem.toString()
         }
-        userData[LANGUAGE] = "$lang1,$lang2"
+//        userData[LANGUAGE] = "$lang1,$lang2"
+        myUser.language = "$lang1,$lang2"
 
         if (trackSpinner.selectedItemPosition > 0) {
-            userData[TRACK] = trackSpinner.selectedItem.toString()
+//            userData[TRACK] = trackSpinner.selectedItem.toString()
+            myUser.userTrack = trackSpinner.selectedItem.toString()
+        } else {
+            myUser.userTrack = ""
         }
 
         if (projectsSpinner.selectedItemPosition > 0) {
-            userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
+//            userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
+            myUser.currentProject = projectsSpinner.selectedItem.toString()
+        } else {
+            myUser.currentProject = ""
         }
 
-        val oldProject = QueryUtils.getProject(myUser.track, myUser.currentProject ?: "")
         var newProject: ProjectsModel? = null
-        if (userData[TRACK] != null && userData[CURRENT_PROJECT] != null) {
-            newProject = QueryUtils.getProject(userData[TRACK] as String
-                    , userData[CURRENT_PROJECT] as String)
+        if (myUser.userTrack != "" && myUser.currentProject != "") {
+            newProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
         }
-        val oldLang1 = myUser.language1
-        val oldLang2 = myUser.language2
 
         //put userdata to database (path to myUserdata is declared in userLogIn function)
-        myUserData.set(userData).addOnSuccessListener({
+        myUserData.set(myUser).addOnSuccessListener({
             Toast.makeText(this@UserActivity, getString(R.string.dataSaved), Toast.LENGTH_SHORT).show()
 
+            var flagForceUpdateLanguage = false
             if (newProject?.id ?: "" != oldProject?.id ?: "") {
-                if (oldProject != null) {
-                    updateProject(oldProject, -1)
-                }
-                if (newProject != null) {
-                    updateProject(newProject, 1)
+                if (oldProject != newProject) {
+                    if (oldProject != null) {
+                        updateProject(oldProject, -1)
+                    }
+                    if (newProject != null) {
+                        updateProject(newProject, 1)
+                        flagForceUpdateLanguage = true
+                    }
                 }
             }
 
-            if (oldLang1 != lang1) {
-                updateUserByLang(myUserData.id, userData[CURRENT_PROJECT] as String, oldLang1, lang1)
+            if (oldLang1 != lang1 || flagForceUpdateLanguage) {
+                updateUserByLang(myUserData.id, myUser.currentProject, oldLang1, lang1)
             }
 
-            if (oldLang2 != lang2) {
-                updateUserByLang(myUserData.id, userData[CURRENT_PROJECT] as String, oldLang2, lang2)
+            if (oldLang2 != lang2 || flagForceUpdateLanguage) {
+                updateUserByLang(myUserData.id, myUser.currentProject, oldLang2, lang2)
             }
 
         }).addOnFailureListener {
@@ -244,43 +254,44 @@ class UserActivity : AppCompatActivity() {
                             GoogleAuthProvider.getCredential(token, null)
                         }
 
-                        currentUser.reauthenticate(credential)
-                                .addOnCompleteListener({
+                        currentUser.reauthenticate(credential).addOnCompleteListener({
+                            if (task.isSuccessful) {
+
+                                //Calling delete to remove the user and wait for a result.
+                                currentUser.delete().addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
 
-                                        //Calling delete to remove the user and wait for a result.
-                                        currentUser.delete().addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
+                                        toast(getString(R.string.userDeleted))
+                                        //Delete data from database
 
-                                                toast(getString(R.string.userDeleted))
-                                                //Delete data from database
-
-                                                //Decrease nbUser of the project
-                                                val project = QueryUtils.getProject(myUser.track, myUser.currentProject
-                                                        ?: "")
-                                                if (project != null) {
-                                                    updateProject(project, -1)
-                                                }
-
-                                                //Delete user from UsersByLanguage
-                                                updateUserByLang(myUserData.id, "", myUser.language1, "")
-                                                updateUserByLang(myUserData.id, "", myUser.language2, "")
-
-                                                myUserData.delete()
-
-                                            } else {
-
-                                                alert(getString(R.string.log_out_message_for_delete_user)) {
-                                                    positiveButton(getString(R.string.ok)) { }
-                                                }.show()
-
-                                                Log.e("usun usera ", "${task.exception}")
-                                            }
+                                        //Decrease nbUser of the project
+                                        val project = QueryUtils.getProject(myUser.userTrack
+                                                , myUser.currentProject)
+                                        if (project != null) {
+                                            updateProject(project, -1)
                                         }
-                                        startActivity<MainActivity>()
-                                        finish()
+
+                                        //Delete user from UsersByLanguage
+                                        updateUserByLang(myUserData.id, ""
+                                                , myUser.getLanguage(0), "")
+                                        updateUserByLang(myUserData.id, ""
+                                                , myUser.getLanguage(1), "")
+
+                                        myUserData.delete()
+
+                                    } else {
+
+                                        alert(getString(R.string.log_out_message_for_delete_user)) {
+                                            positiveButton(getString(R.string.ok)) { }
+                                        }.show()
+
+                                        Log.e("usun usera ", "${task.exception}")
                                     }
-                                })
+                                }
+                                startActivity<MainActivity>()
+                                finish()
+                            }
+                        })
                     }
                 }
     }
@@ -310,8 +321,6 @@ class UserActivity : AppCompatActivity() {
                 fetchUserData()
                 ifUserIsVerified()
 
-                //TODO save a new user with empty fields to the database immediately after registration
-
                 welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
             } else {
                 // User is signed out - show login screen
@@ -335,12 +344,15 @@ class UserActivity : AppCompatActivity() {
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
-                myUser.slackNick = snapshot.getString(SLACK_NAME)
 
-                myUser.currentProject = snapshot.getString(CURRENT_PROJECT)
-                myUser.language1 = snapshot.getString(LANGUAGE)?.split(",")?.get(0) ?: ""
-                myUser.language2 = snapshot.getString(LANGUAGE)?.split(",")?.get(1) ?: ""
-                myUser.track = snapshot.getString(TRACK) ?: ""
+                myUser = snapshot.toObject(UserModel::class.java) ?: myUser
+
+//                myUser.slackNick = snapshot.getString(SLACK_NAME)
+//
+//                myUser.currentProject = snapshot.getString(CURRENT_PROJECT)
+//                myUser.language1 = snapshot.getString(LANGUAGE)?.split(",")?.get(0) ?: ""
+//                myUser.language2 = snapshot.getString(LANGUAGE)?.split(",")?.get(1) ?: ""
+//                myUser.track = snapshot.getString(TRACK) ?: ""
 
                 updateUserData()
             } else {
@@ -352,9 +364,9 @@ class UserActivity : AppCompatActivity() {
 
     private fun updateUserData() {
         //take data in correct order
-        val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(myUser.language1)
-        val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(myUser.language2)
-        val spinnerPositionTracks = spinnerAdapterTracks.getPosition(myUser.track)
+        val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(myUser.getLanguage(0))
+        val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(myUser.getLanguage(1))
+        val spinnerPositionTracks = spinnerAdapterTracks.getPosition(myUser.userTrack)
 
         //for tracks
         trackSpinner.setSelection(spinnerPositionTracks)
@@ -366,6 +378,9 @@ class UserActivity : AppCompatActivity() {
         lang2Spinner.setSelection(spinnerPositionLang2)
     }
 
+    /**
+     * Fill the spinner with Generic data
+     */
     private fun fillData() {
 
         val tracks = QueryUtils.getStringTracks()
@@ -396,7 +411,7 @@ class UserActivity : AppCompatActivity() {
         lang2Spinner.adapter = spinnerAdapterLanguages2
 
         // Here we have all the spinner data available, we can now fill connect the user
-        updateUserData()
+//        updateUserData()
     }
 
     private fun updateProjectSpinner(selectedTrack: String) {

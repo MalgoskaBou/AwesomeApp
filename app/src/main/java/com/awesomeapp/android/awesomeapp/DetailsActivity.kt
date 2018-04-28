@@ -27,10 +27,6 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE
-import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
-import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
-import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
@@ -150,8 +146,9 @@ class DetailsActivity : MenuActivity() {
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
                 for (document in snapshots) {
-                    val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
-                    val user = UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay)
+                    //val languagesToDisplay = "${document.get(LANGUAGE_1)}, ${document.get(LANGUAGE_2)}"
+                    // TODO correct
+                    val user = UserModel() //UserModel(document.get(SLACK_NAME).toString(), languagesToDisplay)
 
                     rv.removeAllViews()
                     users.add(user)
@@ -239,8 +236,9 @@ class DetailsActivity : MenuActivity() {
                         myUsers.document(userId).get().addOnSuccessListener({
                             Log.d(DetailsActivity::class.simpleName, "Get User ${it.id}")
 
-                            val languagesToDisplay = "${it.get(LANGUAGE)}"
-                            val user = UserModel(it.get(SLACK_NAME).toString(), languagesToDisplay)
+                            //val languagesToDisplay = "${it.get(LANGUAGE)}"
+                            // TODO correct
+                            val user = UserModel()//UserModel(it.get(SLACK_NAME).toString(), languagesToDisplay)
 
                             rv.removeAllViews()
                             users.add(user)

@@ -16,4 +16,15 @@
 
 package com.awesomeapp.android.awesomeapp.model
 
-class UserModel (var slackName: String, var userLanguages: String)
+data class UserModel(var currentProject: String, var language: String, var slackName: String
+                     , var userEmail: String, var userName: String, var userTrack: String) {
+    constructor() : this("", "", "", "", "", "")
+
+    fun getLanguage(index: Int): String {
+        try {
+            return language.split(",")[index]
+        } catch (e: IndexOutOfBoundsException) {
+            return ""
+        }
+    }
+}
