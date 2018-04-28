@@ -26,24 +26,9 @@ object Constant {
     const val TRACK_FEND = "FEND"
     const val TRACK_MWS = "MWS"
 
-    //database model - helpdata
-    const val TRACKS_ARRAY = "tracksArray"
-    const val LANG_TABLE = "langsArray"
-
-    const val AND_PROJECTS = "andProjectsArray"
-    const val MWS_PROJECTS = "mwsProjectsArray"
-    const val ABND_PROJECTS = "abndProjectsArray"
-    const val FEND_PROJECTS = "fendProjectsArray"
-
     //database model - user
-    const val USER_NAME = "userName"
-    const val USER_EMAIL = "userEmail"
     const val SLACK_NAME = "slackName"
-    const val LANGUAGE = "language"
-    const val LANGUAGE_1 = "languageFirst"
-    const val LANGUAGE_2 = "languageSecond"
     const val CURRENT_PROJECT = "currentProject"
-    const val TRACK = "userTrack"
 
     //key for intent in MainActivity
     const val TABLE_WITH_DATA = "TABLE"
@@ -52,6 +37,5 @@ object Constant {
     const val WHICH_TRACT = "whichTrack"
 
     //help data hook
-    val myHelpData = FirebaseFirestore.getInstance().document("helpData/tracks")
     val myUsers = FirebaseFirestore.getInstance().collection("Users")
 }

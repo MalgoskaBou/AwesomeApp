@@ -136,15 +136,9 @@ class UserActivity : AppCompatActivity() {
         val oldLang2 = myUser.getLanguage(1)
         val oldProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
 
-        //create hashMap with necessary user data what I want to put to database
-//        val userData = HashMap<String, Any>()
-//        userData[USER_NAME] = userName
-//        userData[USER_EMAIL] = userEmail
         if (slackNick.text == null || slackNick.text.toString().trim() == "") {
-//            userData[SLACK_NAME] = getString(R.string.undefined)
             myUser.slackName = getString(R.string.undefined)
         } else {
-//            userData[SLACK_NAME] = slackNick.text.toString()
             myUser.slackName = slackNick.text.toString()
         }
 
@@ -157,18 +151,15 @@ class UserActivity : AppCompatActivity() {
         if (lang2Spinner.selectedItemPosition > 0) {
             lang2 = lang2Spinner.selectedItem.toString()
         }
-//        userData[LANGUAGE] = "$lang1,$lang2"
         myUser.language = "$lang1,$lang2"
 
         if (trackSpinner.selectedItemPosition > 0) {
-//            userData[TRACK] = trackSpinner.selectedItem.toString()
             myUser.userTrack = trackSpinner.selectedItem.toString()
         } else {
             myUser.userTrack = ""
         }
 
         if (projectsSpinner.selectedItemPosition > 0) {
-//            userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
             myUser.currentProject = projectsSpinner.selectedItem.toString()
         } else {
             myUser.currentProject = ""
@@ -347,13 +338,6 @@ class UserActivity : AppCompatActivity() {
 
                 myUser = snapshot.toObject(UserModel::class.java) ?: myUser
 
-//                myUser.slackNick = snapshot.getString(SLACK_NAME)
-//
-//                myUser.currentProject = snapshot.getString(CURRENT_PROJECT)
-//                myUser.language1 = snapshot.getString(LANGUAGE)?.split(",")?.get(0) ?: ""
-//                myUser.language2 = snapshot.getString(LANGUAGE)?.split(",")?.get(1) ?: ""
-//                myUser.track = snapshot.getString(TRACK) ?: ""
-
                 updateUserData()
             } else {
                 toast(getString(R.string.chooseMessage))
@@ -409,9 +393,6 @@ class UserActivity : AppCompatActivity() {
         spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, languages)
         spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         lang2Spinner.adapter = spinnerAdapterLanguages2
-
-        // Here we have all the spinner data available, we can now fill connect the user
-//        updateUserData()
     }
 
     private fun updateProjectSpinner(selectedTrack: String) {
