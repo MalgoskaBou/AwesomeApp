@@ -34,7 +34,9 @@ object Constant {
     const val TABLE_WITH_DATA = "TABLE"
     //key for intent in ProjectsActivity
     const val WHICH_PROJECT = "whichProject"
-    const val WHICH_TRACT = "whichTrack"
+    const val WHICH_DEADLINE = "whichDeadline"
+    const val WHICH_NB_USERS = "whichNbUsers"
+
 
     //help data hook
     val myUsers = FirebaseFirestore.getInstance().collection("Users")

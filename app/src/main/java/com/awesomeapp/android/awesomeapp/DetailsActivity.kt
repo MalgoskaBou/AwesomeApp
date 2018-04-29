@@ -27,6 +27,8 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import com.awesomeapp.android.awesomeapp.adapters.UserAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
+import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_DEADLINE
+import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_NB_USERS
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.UserModel
@@ -50,6 +52,8 @@ class DetailsActivity : MenuActivity() {
     private var adapter = UserAdapter(users)
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
+    private lateinit var deadlineExtra: String
+    private lateinit var nbUsersExtra: String
     private lateinit var rv: RecyclerView
     private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout
@@ -62,8 +66,13 @@ class DetailsActivity : MenuActivity() {
 
         val intent = intent
         projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
+        deadlineExtra = intent.getStringExtra(WHICH_DEADLINE)
+        nbUsersExtra = intent.getStringExtra(WHICH_NB_USERS)
 
         projectNameTxt.text = projectNameExtra
+        deadLineTxt.text = deadlineExtra
+        nbOfUsersTxt.text = nbUsersExtra
+
         noOneWorkCurrently.visibility = View.GONE
         myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
         myProgressBar?.show()

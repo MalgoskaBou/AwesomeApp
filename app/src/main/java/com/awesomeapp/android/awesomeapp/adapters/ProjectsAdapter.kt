@@ -25,8 +25,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.awesomeapp.android.awesomeapp.DetailsActivity
 import com.awesomeapp.android.awesomeapp.R
+import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_DEADLINE
+import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_NB_USERS
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_TRACT
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import kotlinx.android.synthetic.main.activity_details.view.*
 import java.text.SimpleDateFormat
@@ -46,17 +47,19 @@ class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val co
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val dateFormatter = SimpleDateFormat("MMM d yyyy", Locale.getDefault())
-        val formatedData = "Deadline: ${dateFormatter.format(projectsList[position].deadline).toUpperCase()}"
+        val formatedData = "${context.resources.getString(R.string.deadline)} ${dateFormatter.format(projectsList[position].deadline).toUpperCase()}"
 
         holder.projectNameTxt?.text = projectsList[position].name
         holder.deadLineTxt?.text = formatedData
-        holder.percentOfUsersTxt?.text = projectsList[position].nbUsers.toString()
+        holder.nbOfUsersTxt?.text = projectsList[position].nbUsers.toString()
 
         val intentToDetails = Intent(context, DetailsActivity::class.java)
 
         holder.itemView.setOnClickListener{
             intentToDetails.putExtra(WHICH_PROJECT, projectsList[position].name)
-            intentToDetails.putExtra(WHICH_TRACT, whichTrack)
+            intentToDetails.putExtra(WHICH_DEADLINE, formatedData)
+            intentToDetails.putExtra(WHICH_NB_USERS, projectsList[position].nbUsers.toString())
+
             context.startActivity(intentToDetails)
         }
     }
@@ -64,6 +67,6 @@ class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val co
     inner class ViewHolder (itemView: View): RecyclerView.ViewHolder(itemView){
         val projectNameTxt: TextView? = itemView.projectNameTxt
         val deadLineTxt: TextView? = itemView.deadLineTxt
-        val percentOfUsersTxt: TextView? = itemView.percentOfUsersTxt
+        val nbOfUsersTxt: TextView? = itemView.nbOfUsersTxt
     }
 }
