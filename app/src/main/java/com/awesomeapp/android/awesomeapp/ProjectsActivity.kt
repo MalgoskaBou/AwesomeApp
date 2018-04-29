@@ -31,10 +31,12 @@ class ProjectsActivity : MenuActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_projects)
-        setSupportActionBar(myToolbar)
 
         val intent = intent
         val track = intent.getStringExtra(TABLE_WITH_DATA)
+
+        myToolbar.title = track
+        setSupportActionBar(myToolbar)
 
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)

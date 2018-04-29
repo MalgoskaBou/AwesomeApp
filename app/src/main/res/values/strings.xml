@@ -63,6 +63,7 @@
     <string name="ok">OK</string>
     <string name="chooseMessage">Choose your track and current project</string>
     <string name="waitingMessage">Wait for data loading</string>
+    <string name="deadline">Deadline: </string>
 
 
 </resources>
