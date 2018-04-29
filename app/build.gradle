@@ -28,7 +28,7 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
-
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -66,6 +66,7 @@ dependencies {
     //SwipyRefreshLayout
     implementation 'com.github.omadahealth:swipy:1.2.3@aar'
 
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 
 apply plugin: 'com.google.gms.google-services'

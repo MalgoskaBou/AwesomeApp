@@ -16,4 +16,8 @@
 
 package com.awesomeapp.android.awesomeapp.model
 
-data class ProjectsModel (val projName: String, val deadline: String, val percentOfUsers: String)
+import java.util.*
+
+data class ProjectsModel(var id: String, var name: String, var deadline: Date, var nbUsers: Long, var order: Long) {
+    constructor() : this("", "", Date(), 0, 0)
+}

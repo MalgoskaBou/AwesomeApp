@@ -17,14 +17,10 @@
 package com.awesomeapp.android.awesomeapp.model
 
 /**
- * Created by Fabien Boismoreau on 16/04/2018.
+ * Created by Fabien Boismoreau on 27/04/2018.
  * <p>
  */
 
-class MyUser {
-    var slackNick: String? = null
-    var currentProject: String? = null
-    var language1: String = ""
-    var language2: String = ""
-    var track: String = ""
+data class LanguageModel(var id: String, var name: String) {
+    constructor() : this("", "")
 }

@@ -24,27 +24,15 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import com.awesomeapp.android.awesomeapp.data.Constant.ABND_PROJECTS
-import com.awesomeapp.android.awesomeapp.data.Constant.AND_PROJECTS
-import com.awesomeapp.android.awesomeapp.data.Constant.CURRENT_PROJECT
-import com.awesomeapp.android.awesomeapp.data.Constant.FEND_PROJECTS
-import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_1
-import com.awesomeapp.android.awesomeapp.data.Constant.LANGUAGE_2
-import com.awesomeapp.android.awesomeapp.data.Constant.LANG_TABLE
-import com.awesomeapp.android.awesomeapp.data.Constant.MWS_PROJECTS
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
-import com.awesomeapp.android.awesomeapp.data.Constant.TRACK
-import com.awesomeapp.android.awesomeapp.data.Constant.TRACKS_ARRAY
-import com.awesomeapp.android.awesomeapp.data.Constant.USER_EMAIL
-import com.awesomeapp.android.awesomeapp.data.Constant.USER_NAME
-import com.awesomeapp.android.awesomeapp.model.MyUser
+import com.awesomeapp.android.awesomeapp.model.ProjectsModel
+import com.awesomeapp.android.awesomeapp.model.UserModel
+import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
@@ -62,7 +50,6 @@ class UserActivity : AppCompatActivity() {
     private lateinit var mAuth: FirebaseAuth
     private lateinit var myDatabase: FirebaseFirestore
     private lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
-    private lateinit var myHelpData: DocumentReference
     private lateinit var myUserData: DocumentReference
 
     //get user data from user panel
@@ -70,7 +57,7 @@ class UserActivity : AppCompatActivity() {
     private lateinit var userEmail: String
     private lateinit var userUid: String
 
-    private val myUser: MyUser? = MyUser()
+    private var myUser: UserModel = UserModel()
 
     //spinner adapters
     private lateinit var spinnerAdapterTracks: ArrayAdapter<String>
@@ -85,9 +72,6 @@ class UserActivity : AppCompatActivity() {
 
         //get database hook
         myDatabase = FirebaseFirestore.getInstance()
-        //get helpData->tracks document
-        myHelpData = myDatabase.document("helpData/tracks")
-        //get access to users data
         mAuth = FirebaseAuth.getInstance()
 
         // Set the listeners
@@ -102,8 +86,8 @@ class UserActivity : AppCompatActivity() {
             }
         }
 
-        //GET DATA FROM DATABASE - helpData
-        getDataFromDatabase()
+        //Fill spinner
+        fillData()
 
         //DATABASE LOG IN -
         userLogIn()
@@ -112,18 +96,19 @@ class UserActivity : AppCompatActivity() {
         saveBtn.setOnClickListener { _ ->
             saveUser()
         }
+
         logOutBtn.setOnClickListener { _ ->
 
-            alert("are you sure that you want log out?") {
-                title = "Log out"
+            alert(getString(R.string.logoutConfirmation)) {
+                title = getString(R.string.logout)
                 yesButton { logOutUser() }
                 noButton { }
             }.show()
         }
 
         deleteUserButton.setOnClickListener {
-            alert("are you sure that you want delete your account?") {
-                title = "Delete account"
+            alert(getString(R.string.deleteConfirmation)) {
+                title = getString(R.string.deleteAccount)
                 yesButton { deleteUser() }
                 noButton { }
             }.show()
@@ -136,9 +121,9 @@ class UserActivity : AppCompatActivity() {
 
             mAuth.currentUser?.sendEmailVerification()
 
-            alert("Verificate your email") {
-                positiveButton("Send me link") { mAuth.currentUser?.sendEmailVerification() }
-                negativeButton("Refresh") { mAuth.currentUser?.reload() }
+            alert(getString(R.string.verifyEmail)) {
+                positiveButton(getString(R.string.sendLink)) { mAuth.currentUser?.sendEmailVerification() }
+                negativeButton(getString(R.string.refresh)) { mAuth.currentUser?.reload() }
 
             }.show()
         }
@@ -146,37 +131,100 @@ class UserActivity : AppCompatActivity() {
 
     private fun saveUser() {
 
-        //create hashMap with necessary user data what I want to put to database
-        val userData = HashMap<String, Any>()
-        userData[USER_NAME] = userName
-        userData[USER_EMAIL] = userEmail
-        if (slackNick.text == null || slackNick.text.toString().trim() == "")
-            userData[SLACK_NAME] = "undefined"
-        else
-            userData[SLACK_NAME] = slackNick.text.toString()
+        // Get old values
+        val oldLang1 = myUser.getLanguage(0)
+        val oldLang2 = myUser.getLanguage(1)
+        val oldProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
 
+        if (slackNick.text == null || slackNick.text.toString().trim() == "") {
+            myUser.slackName = getString(R.string.undefined)
+        } else {
+            myUser.slackName = slackNick.text.toString()
+        }
+
+        var lang1 = ""
+        var lang2 = ""
         if (lang1Spinner.selectedItemPosition > 0) {
-            userData[LANGUAGE_1] = lang1Spinner.selectedItem.toString()
+            lang1 = lang1Spinner.selectedItem.toString()
         }
 
         if (lang2Spinner.selectedItemPosition > 0) {
-            userData[LANGUAGE_2] = lang2Spinner.selectedItem.toString()
+            lang2 = lang2Spinner.selectedItem.toString()
         }
+        myUser.language = "$lang1,$lang2"
 
         if (trackSpinner.selectedItemPosition > 0) {
-            userData[TRACK] = trackSpinner.selectedItem.toString()
+            myUser.userTrack = trackSpinner.selectedItem.toString()
+        } else {
+            myUser.userTrack = ""
         }
 
         if (projectsSpinner.selectedItemPosition > 0) {
-            userData[CURRENT_PROJECT] = projectsSpinner.selectedItem.toString()
+            myUser.currentProject = projectsSpinner.selectedItem.toString()
+        } else {
+            myUser.currentProject = ""
+        }
+
+        var newProject: ProjectsModel? = null
+        if (myUser.userTrack != "" && myUser.currentProject != "") {
+            newProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
         }
 
         //put userdata to database (path to myUserdata is declared in userLogIn function)
-        myUserData.set(userData).addOnSuccessListener({
-            Toast.makeText(this@UserActivity, "Data saved", Toast.LENGTH_SHORT).show()
+        myUserData.set(myUser).addOnSuccessListener({
+            Toast.makeText(this@UserActivity, getString(R.string.dataSaved), Toast.LENGTH_SHORT).show()
+
+            var flagForceUpdateLanguage = false
+            if (newProject?.id ?: "" != oldProject?.id ?: "") {
+                if (oldProject != newProject) {
+                    if (oldProject != null) {
+                        updateProject(oldProject, -1)
+                    }
+                    if (newProject != null) {
+                        updateProject(newProject, 1)
+                        flagForceUpdateLanguage = true
+                    }
+                }
+            }
+
+            if (oldLang1 != lang1 || flagForceUpdateLanguage) {
+                updateUserByLang(myUserData.id, myUser.currentProject, oldLang1, lang1)
+            }
+
+            if (oldLang2 != lang2 || flagForceUpdateLanguage) {
+                updateUserByLang(myUserData.id, myUser.currentProject, oldLang2, lang2)
+            }
 
         }).addOnFailureListener {
-            Toast.makeText(this@UserActivity, "Something wrong :( try again", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@UserActivity, getString(R.string.somethingWrong), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateProject(project: ProjectsModel, value: Long) {
+        project.nbUsers = project.nbUsers + value
+        myDatabase.document("Projects/${project.id}").set(project).addOnSuccessListener({
+            Log.d(UserActivity::class.simpleName, "Project ${project.id} saved")
+        }).addOnFailureListener {
+            Log.d(UserActivity::class.simpleName, "Fail in Project ${project.id} saving")
+        }
+    }
+
+    private fun updateUserByLang(user: String, project: String, old: String, new: String) {
+        myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener({
+            Log.d(UserActivity::class.simpleName, "User $user deleted on $old")
+        }).addOnFailureListener {
+            Log.d(UserActivity::class.simpleName, "Fail in deletion $user on $old")
+        }
+
+        if (new != "") {
+            val userByLanguageData = HashMap<String, Any>()
+            userByLanguageData["project"] = project
+            myDatabase.collection("UsersByLanguage").document("${new}_$user").set(userByLanguageData)
+                    .addOnSuccessListener({
+                        Log.d(UserActivity::class.simpleName, "User $user saved on $new")
+                    }).addOnFailureListener {
+                        Log.d(UserActivity::class.simpleName, "Fail in saving $user on $new")
+                    }
         }
     }
 
@@ -197,30 +245,44 @@ class UserActivity : AppCompatActivity() {
                             GoogleAuthProvider.getCredential(token, null)
                         }
 
-                        currentUser.reauthenticate(credential)
-                                .addOnCompleteListener({
+                        currentUser.reauthenticate(credential).addOnCompleteListener({
+                            if (task.isSuccessful) {
+
+                                //Calling delete to remove the user and wait for a result.
+                                currentUser.delete().addOnCompleteListener { task ->
                                     if (task.isSuccessful) {
 
-                                        //Calling delete to remove the user and wait for a result.
-                                        currentUser.delete().addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
+                                        toast(getString(R.string.userDeleted))
+                                        //Delete data from database
 
-                                                toast("User deleted successfully")
-                                                //Delete data from database
-                                                myUserData.delete()
-                                            } else {
-
-                                                alert(getString(R.string.log_out_message_for_delete_user)) {
-                                                    positiveButton("OK") {  }
-                                                }.show()
-
-                                                Log.e("usun usera ", "${task.exception}")
-                                            }
+                                        //Decrease nbUser of the project
+                                        val project = QueryUtils.getProject(myUser.userTrack
+                                                , myUser.currentProject)
+                                        if (project != null) {
+                                            updateProject(project, -1)
                                         }
-                                        startActivity<MainActivity>()
-                                        finish()
+
+                                        //Delete user from UsersByLanguage
+                                        updateUserByLang(myUserData.id, ""
+                                                , myUser.getLanguage(0), "")
+                                        updateUserByLang(myUserData.id, ""
+                                                , myUser.getLanguage(1), "")
+
+                                        myUserData.delete()
+
+                                    } else {
+
+                                        alert(getString(R.string.log_out_message_for_delete_user)) {
+                                            positiveButton(getString(R.string.ok)) { }
+                                        }.show()
+
+                                        Log.e("usun usera ", "${task.exception}")
                                     }
-                                })
+                                }
+                                startActivity<MainActivity>()
+                                finish()
+                            }
+                        })
                     }
                 }
     }
@@ -250,8 +312,6 @@ class UserActivity : AppCompatActivity() {
                 fetchUserData()
                 ifUserIsVerified()
 
-                //TODO save a new user with empty fields to the database immediately after registration
-
                 welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
             } else {
                 // User is signed out - show login screen
@@ -275,16 +335,12 @@ class UserActivity : AppCompatActivity() {
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
-                myUser!!.slackNick = snapshot.getString(SLACK_NAME)
 
-                myUser.currentProject = snapshot.getString(CURRENT_PROJECT)
-                myUser.language1 = snapshot.getString(LANGUAGE_1)
-                myUser.language2 = snapshot.getString(LANGUAGE_2)
-                myUser.track = snapshot.getString(TRACK)
+                myUser = snapshot.toObject(UserModel::class.java) ?: myUser
 
                 updateUserData()
             } else {
-                toast("Choose your patch and current project")
+                toast(getString(R.string.chooseMessage))
                 saveUser()
             }
         })
@@ -292,9 +348,9 @@ class UserActivity : AppCompatActivity() {
 
     private fun updateUserData() {
         //take data in correct order
-        val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(myUser!!.language1)
-        val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(myUser.language2)
-        val spinnerPositionTracks = spinnerAdapterTracks.getPosition(myUser.track)
+        val spinnerPositionLang1 = spinnerAdapterLanguages1.getPosition(myUser.getLanguage(0))
+        val spinnerPositionLang2 = spinnerAdapterLanguages2.getPosition(myUser.getLanguage(1))
+        val spinnerPositionTracks = spinnerAdapterTracks.getPosition(myUser.userTrack)
 
         //for tracks
         trackSpinner.setSelection(spinnerPositionTracks)
@@ -304,78 +360,39 @@ class UserActivity : AppCompatActivity() {
 
         //lang2
         lang2Spinner.setSelection(spinnerPositionLang2)
-
     }
 
-    private fun getDataFromDatabase() {
+    /**
+     * Fill the spinner with Generic data
+     */
+    private fun fillData() {
 
-        //get helpData (snapshotListener allow synchronize data in real time)
-        myHelpData.addSnapshotListener(this, EventListener<DocumentSnapshot> { snapshots, e ->
-            if (e != null) {
-                Log.w("error - ", e)
-                toast("Error :(")
-                return@EventListener
+        val tracks = QueryUtils.getStringTracks()
+        val languages = QueryUtils.getStringLanguages()
 
-            } else if (snapshots!!.exists()) {
-                @Suppress("UNCHECKED_CAST")
-                val tracksTable = snapshots[TRACKS_ARRAY] as ArrayList<String>
-                tracksTable.sort()
-                tracksTable.add(0, getString(R.string.selectTrack))
+        for (track in tracks) {
+            val projects = QueryUtils.getStringProjects(track)
+            projects.add(0, getString(R.string.selectProject))
+            spinnerAdapterProjects[track] = ArrayAdapter(applicationContext,
+                    android.R.layout.simple_spinner_item, projects)
+        }
 
-                @Suppress("UNCHECKED_CAST")
-                val langTable = snapshots[LANG_TABLE] as ArrayList<String>
-                langTable.sort()
-                langTable.add(0, getString(R.string.selectLanguage))
+        tracks.add(0, getString(R.string.selectTrack))
+        languages.add(0, getString(R.string.selectLanguage))
 
-                @Suppress("UNCHECKED_CAST")
-                val andProjTable = snapshots[AND_PROJECTS] as ArrayList<String>
-                andProjTable.sort()
-                andProjTable.add(0, getString(R.string.selectProject))
+        //Tracks list
+        spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracks)
+        spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        trackSpinner.adapter = spinnerAdapterTracks
 
-                @Suppress("UNCHECKED_CAST")
-                val mwsProjTable = snapshots[MWS_PROJECTS] as ArrayList<String>
-                mwsProjTable.sort()
-                mwsProjTable.add(0, getString(R.string.selectProject))
+        //Languages lists (there are 2 fields for this) but need get position this why I create 2 adapters
+        spinnerAdapterLanguages1 = ArrayAdapter(this, android.R.layout.simple_spinner_item, languages)
+        spinnerAdapterLanguages1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        lang1Spinner.adapter = spinnerAdapterLanguages1
 
-                @Suppress("UNCHECKED_CAST")
-                val abndProjTable = snapshots[ABND_PROJECTS] as ArrayList<String>
-                abndProjTable.sort()
-                abndProjTable.add(0, getString(R.string.selectProject))
-
-                @Suppress("UNCHECKED_CAST")
-                val fendProjTable = snapshots[FEND_PROJECTS] as ArrayList<String>
-                fendProjTable.sort()
-                fendProjTable.add(0, getString(R.string.selectProject))
-
-
-                spinnerAdapterProjects["AND"] = ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, andProjTable)
-                spinnerAdapterProjects["ABND"] = ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, abndProjTable)
-                spinnerAdapterProjects["MWS"] = ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, mwsProjTable)
-                spinnerAdapterProjects["FEND"] = ArrayAdapter(applicationContext,
-                        android.R.layout.simple_spinner_item, fendProjTable)
-
-                //I add a table taken from the database to the appropriate spinners
-                //Tracks list
-                spinnerAdapterTracks = ArrayAdapter(this, android.R.layout.simple_spinner_item, tracksTable)
-                spinnerAdapterTracks.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                trackSpinner.adapter = spinnerAdapterTracks
-
-                //Languages lists (there are 2 fields for this) but need get position this why I create 2 adapters
-                spinnerAdapterLanguages1 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
-                spinnerAdapterLanguages1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                lang1Spinner.adapter = spinnerAdapterLanguages1
-
-                spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, langTable)
-                spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                lang2Spinner.adapter = spinnerAdapterLanguages2
-
-                // Here we have all the spinner data available, we can now fill connect the user
-                updateUserData()
-            }
-        })
+        spinnerAdapterLanguages2 = ArrayAdapter(this, android.R.layout.simple_spinner_item, languages)
+        spinnerAdapterLanguages2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        lang2Spinner.adapter = spinnerAdapterLanguages2
     }
 
     private fun updateProjectSpinner(selectedTrack: String) {
@@ -387,7 +404,7 @@ class UserActivity : AppCompatActivity() {
 
             //If the user is logged, we should try to select the right project
             val spinnerPositionProjects = selectedSpinnerAdapterProjects
-                    .getPosition(myUser!!.currentProject)
+                    .getPosition(myUser.currentProject)
             projectsSpinner.setSelection(spinnerPositionProjects)
         } else {
             projectsSpinner.adapter = null
