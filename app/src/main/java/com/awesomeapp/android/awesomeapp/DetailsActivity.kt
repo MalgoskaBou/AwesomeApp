@@ -83,8 +83,6 @@ class DetailsActivity : MenuActivity() {
 
         initialiseLanguages()
 
-        loadUsers()
-
         swipeLayout = findViewById(R.id.swipyrefreshlayout)
         swipeLayout.setOnRefreshListener({
             loadMoreUsers()
