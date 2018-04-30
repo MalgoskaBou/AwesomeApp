@@ -37,19 +37,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
-import java.util.*
-import kotlin.collections.HashMap
-
-
-//flag for registered user
-private const val RC_SIGN_IN = 1
 
 class UserActivity : AppCompatActivity() {
 
     //hooks to database
     private lateinit var mAuth: FirebaseAuth
     private lateinit var myDatabase: FirebaseFirestore
-    private lateinit var mAuthStateListener: FirebaseAuth.AuthStateListener
     private lateinit var myUserData: DocumentReference
 
     //get user data from user panel
@@ -90,7 +83,7 @@ class UserActivity : AppCompatActivity() {
         fillData()
 
         //DATABASE LOG IN -
-        userLogIn()
+        getUserInfos()
 
         //Put user data to database
         saveBtn.setOnClickListener { _ ->
@@ -170,7 +163,7 @@ class UserActivity : AppCompatActivity() {
             newProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
         }
 
-        //put userdata to database (path to myUserdata is declared in userLogIn function)
+        //put userdata to database (path to myUserdata is declared in getUserInfos function)
         myUserData.set(myUser).addOnSuccessListener({
             Toast.makeText(this@UserActivity, getString(R.string.dataSaved), Toast.LENGTH_SHORT).show()
 
@@ -294,38 +287,22 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    private fun userLogIn() {
+    private fun getUserInfos() {
 
-        //check if user is login
-        mAuthStateListener = FirebaseAuth.AuthStateListener { auth ->
-            val user = auth.currentUser
-            if (user != null) {
-                // User is signed in - get data from log in
-                userName = user.displayName!!
-                userEmail = user.email!!
-                userUid = user.uid
+        val user = mAuth.currentUser
+        // User is signed in - get data from log in
+        userName = user!!.displayName!!
+        userEmail = user.email!!
+        userUid = user.uid
 
-                //get document with actual user from database
-                myUserData = myDatabase.document("Users/$userUid")
+        //get document with actual user from database
+        myUserData = myDatabase.document("Users/$userUid")
 
-                //fetch data from database
-                fetchUserData()
-                ifUserIsVerified()
+        //fetch data from database
+        fetchUserData()
+        ifUserIsVerified()
 
-                welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
-            } else {
-                // User is signed out - show login screen
-                startActivityForResult(
-                        AuthUI.getInstance()
-                                .createSignInIntentBuilder()
-                                .setIsSmartLockEnabled(false)
-                                .setAvailableProviders(
-                                        Arrays.asList(AuthUI.IdpConfig.EmailBuilder().build(),
-                                                AuthUI.IdpConfig.GoogleBuilder().build()))
-                                .build(),
-                        RC_SIGN_IN)
-            }
-        }
+        welcomeText.text = getString(R.string.welcome_message, userName, userEmail)
     }
 
     private fun fetchUserData() {
@@ -409,18 +386,5 @@ class UserActivity : AppCompatActivity() {
         } else {
             projectsSpinner.adapter = null
         }
-    }
-
-    override fun onResume() {
-
-        super.onResume()
-        //we're adding a listening to the user's login
-        mAuth.addAuthStateListener(mAuthStateListener)
-    }
-
-    override fun onPause() {
-
-        super.onPause()
-        mAuth.removeAuthStateListener(mAuthStateListener)
     }
 }
