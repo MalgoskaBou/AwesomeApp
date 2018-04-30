@@ -21,10 +21,12 @@ data class UserModel(var currentProject: String, var language: String, var slack
     constructor() : this("", "", "", "", "", "")
 
     fun getLanguage(index: Int): String {
+        var lang = ""
         try {
-            return language.split(",")[index]
+            lang = language.split(",")[index]
         } catch (e: IndexOutOfBoundsException) {
-            return ""
+            // It could happen, just ignore it
         }
+        return lang
     }
 }

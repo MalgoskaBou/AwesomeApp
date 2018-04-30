@@ -43,9 +43,6 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 
-
-private const val HOW_MUCH_TO_CHARGE = 1L
-
 class DetailsActivity : MenuActivity() {
 
     private var users: ArrayList<UserModel> = ArrayList()
@@ -82,8 +79,6 @@ class DetailsActivity : MenuActivity() {
         rv.adapter = adapter
 
         initialiseLanguages()
-
-        loadUsers()
 
         swipeLayout = findViewById(R.id.swipyrefreshlayout)
         swipeLayout.setOnRefreshListener({
