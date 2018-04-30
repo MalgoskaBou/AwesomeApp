@@ -79,9 +79,9 @@ class MainActivity : MenuActivity() {
             if (it.isSuccessful) {
                 // After config data is successfully fetched, it must be activated before newly fetched
                 // values are returned.
-                mFirebaseRemoteConfig.activateFetched();
+                mFirebaseRemoteConfig.activateFetched()
             }
             QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
-        });
+        })
     }
 }

@@ -43,7 +43,7 @@ class ProjectsActivity : MenuActivity() {
 
         val projects = QueryUtils.getProjects(track) ?: ArrayList()
 
-        val adapter = ProjectsAdapter(projects, this, track)
+        val adapter = ProjectsAdapter(projects, this)
 
         rv.adapter = adapter
 

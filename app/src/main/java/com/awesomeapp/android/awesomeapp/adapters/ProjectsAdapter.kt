@@ -33,8 +33,8 @@ import kotlinx.android.synthetic.main.activity_details.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val context: Context
-                      , private val whichTrack: String) : RecyclerView.Adapter<ProjectsAdapter.ViewHolder>() {
+class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val context: Context)
+    : RecyclerView.Adapter<ProjectsAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.projects_element, parent, false)
