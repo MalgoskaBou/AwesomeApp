@@ -40,6 +40,7 @@ class QueryUtils private constructor() {
         private val projects = HashMap<String, ArrayList<ProjectsModel>>()
         private val languages = ArrayList<LanguageModel>()
         private var isLoaded = false
+        private var getLimit = 1L
 
         /**
          * Initialise the generic data
@@ -94,6 +95,14 @@ class QueryUtils private constructor() {
                 array.add(language.name)
             }
             return array
+        }
+
+        fun setGetLimit(value: Long) {
+            getLimit = value
+        }
+
+        fun getGetLimit(): Long {
+            return getLimit
         }
 
         private fun loadTracks() {
