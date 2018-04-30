@@ -63,6 +63,7 @@ open class MenuActivity : AppCompatActivity() {
                         AuthUI.getInstance()
                                 .createSignInIntentBuilder()
                                 .setIsSmartLockEnabled(false)
+                                .setLogo(R.drawable.ic_awesomelogoreadyvwithtext)
                                 .setAvailableProviders(
                                         Arrays.asList(AuthUI.IdpConfig.EmailBuilder().build(),
                                                 AuthUI.IdpConfig.GoogleBuilder().build()))
