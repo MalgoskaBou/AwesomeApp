@@ -110,7 +110,8 @@ class DetailsActivity : MenuActivity() {
      */
     private fun loadUsers() {
         isLoading = true
-        val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).limit(HOW_MUCH_TO_CHARGE)
+        val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
+                .limit(QueryUtils.getGetLimit())
         getUsers(query)
     }
 
@@ -128,11 +129,12 @@ class DetailsActivity : MenuActivity() {
                         .whereLessThan(documentId(), lang + "a")
                         .whereEqualTo("project", projectNameExtra)
                         .startAfter(lastVisible!!)
-                        .limit(HOW_MUCH_TO_CHARGE)
+                        .limit(QueryUtils.getGetLimit())
 
                 getUsersFiltered(query)
             } else {
-                val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra).startAfter(lastVisible!!).limit(HOW_MUCH_TO_CHARGE)
+                val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
+                        .startAfter(lastVisible!!).limit(QueryUtils.getGetLimit())
                 getUsers(newQuery)
             }
         } else {
@@ -237,7 +239,7 @@ class DetailsActivity : MenuActivity() {
                     .whereGreaterThanOrEqualTo(documentId(), lang)
                     .whereLessThan(documentId(), lang + "a")
                     .whereEqualTo("project", projectNameExtra)
-                    .limit(HOW_MUCH_TO_CHARGE)
+                    .limit(QueryUtils.getGetLimit())
 
             getUsersFiltered(query)
         } else {

@@ -25,11 +25,15 @@ import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_AND
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_FEND
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_MWS
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 
 
 class MainActivity : MenuActivity() {
+
+    private lateinit var mFirebaseRemoteConfig: FirebaseRemoteConfig
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +41,8 @@ class MainActivity : MenuActivity() {
         setSupportActionBar(myToolbar)
 
         QueryUtils.initialiseDBData()
+
+        getConfig()
 
         val intentToData = Intent(this, ProjectsActivity::class.java)
 
@@ -54,5 +60,28 @@ class MainActivity : MenuActivity() {
         abndAndroid.setOnClickListener(clickListener)
         mwsAndroid.setOnClickListener(clickListener)
         fendAndroid.setOnClickListener(clickListener)
+    }
+
+    private fun getConfig() {
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+
+        //firebase initialization
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+                .setDeveloperModeEnabled(BuildConfig.DEBUG)
+                .build()
+        mFirebaseRemoteConfig.setConfigSettings(configSettings)
+
+        // Set the default values
+        mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults)
+        QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
+
+        mFirebaseRemoteConfig.fetch(0).addOnCompleteListener(this, {
+            if (it.isSuccessful) {
+                // After config data is successfully fetched, it must be activated before newly fetched
+                // values are returned.
+                mFirebaseRemoteConfig.activateFetched();
+            }
+            QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
+        });
     }
 }
