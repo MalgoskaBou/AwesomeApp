@@ -17,8 +17,8 @@
 package com.awesomeapp.android.awesomeapp.model
 
 data class UserModel(var currentProject: String, var language: String, var slackName: String
-                     , var userEmail: String, var userName: String, var userTrack: String) {
-    constructor() : this("", "", "", "", "", "")
+                     , var userTrack: String) {
+    constructor() : this("", "", "", "")
 
     fun getLanguage(index: Int): String {
         var lang = ""
