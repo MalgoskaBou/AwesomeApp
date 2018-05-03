@@ -174,6 +174,8 @@ class DetailsActivity : MenuActivity() {
      * Get the users from the database filtered by language
      */
     private fun getUsersFiltered(query: Query) {
+        myProgressBar?.show()
+
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
                 for (document in snapshots) {
