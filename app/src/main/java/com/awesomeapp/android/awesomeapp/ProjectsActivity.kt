@@ -19,11 +19,19 @@ package com.awesomeapp.android.awesomeapp
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
+import android.view.View
 import android.widget.LinearLayout
+import com.awesomeapp.android.awesomeapp.R.id.*
 import com.awesomeapp.android.awesomeapp.adapters.ProjectsAdapter
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
+import kotlinx.android.synthetic.main.activity_projects.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 
 
 class ProjectsActivity : MenuActivity() {
@@ -41,11 +49,29 @@ class ProjectsActivity : MenuActivity() {
         val rv = findViewById<RecyclerView>(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
-        val projects = QueryUtils.getProjects(track) ?: ArrayList()
+        var projects = QueryUtils.getProjects(track) ?: ArrayList()
 
-        val adapter = ProjectsAdapter(projects, this)
+        var adapter = ProjectsAdapter(projects, this)
 
         rv.adapter = adapter
 
+
+        //if the data in nbUsers will change or the projects will not be able to load when the application is first time turned on
+        swipyrefreshlayout.setOnRefreshListener({
+            adapter.notifyDataSetChanged()
+            swipyrefreshlayout.isRefreshing = false
+
+            if (projects.size == 0) {
+                projects = QueryUtils.getProjects(track) ?: ArrayList()
+                adapter = ProjectsAdapter(projects, this)
+                rv.adapter = adapter
+            }
+        })
+
+        if (projects.size == 0) {
+            alert(getText(R.string.refresh_data_by_swip)) {
+                yesButton { }
+            }.show()
+        }
     }
 }

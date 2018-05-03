@@ -25,6 +25,16 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar_layout" />
 
+    <com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
+        android:id="@+id/swipyrefreshlayout"
+        android:layout_width="@dimen/wrapConstraint"
+        android:layout_height="@dimen/wrapConstraint"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:srl_direction="top">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/projectsList"
         android:layout_width="@dimen/wrapConstraint"
@@ -35,5 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
     </android.support.v7.widget.RecyclerView>
+
+    </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
 </android.support.constraint.ConstraintLayout>
