@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package com.awesomeapp.android.awesomeapp
 
 import android.app.ProgressDialog

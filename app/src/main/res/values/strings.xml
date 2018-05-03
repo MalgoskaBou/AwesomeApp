@@ -60,6 +60,7 @@
     <string name="chooseMessage">Choose your track and current project</string>
     <string name="waitingMessage">Wait for data loading</string>
     <string name="deadline">Deadline: </string>
+    <string name="refresh_data_by_swip">Refresh data by swip</string>
 
 
 </resources>
