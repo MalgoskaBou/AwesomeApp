@@ -176,18 +176,13 @@ class DetailsActivity : MenuActivity() {
             if (snapshots?.size()!! > 0) {
                 for (document in snapshots) {
                     Log.d(DetailsActivity::class.simpleName, "User $document.id")
-                    val userId = document.id.split("_")[1]
 
-                    myUsers.document(userId).get().addOnSuccessListener({
-                        Log.d(DetailsActivity::class.simpleName, "Get User ${it.id}")
-
-                        val user = it.toObject(UserModel::class.java)
-
-                        user ?: return@addOnSuccessListener
+                    val user = UserModel(document["project"] as String? ?: ""
+                            , document["languages"] as String? ?: ""
+                            , document["slackName"] as String? ?: "", "")
 
                         rv.removeAllViews()
                         users.add(user)
-                    })
                 }
                 lastVisible = snapshots.documents[snapshots.size() - 1]
             } else {

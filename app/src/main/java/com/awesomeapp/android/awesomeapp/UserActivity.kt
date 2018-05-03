@@ -181,11 +181,11 @@ class UserActivity : AppCompatActivity() {
             }
 
             if (oldLang1 != lang1 || flagForceUpdateLanguage) {
-                updateUserByLang(myUserData.id, myUser.currentProject, oldLang1, lang1)
+                updateUserByLang(myUserData.id, myUser, oldLang1, lang1)
             }
 
             if (oldLang2 != lang2 || flagForceUpdateLanguage) {
-                updateUserByLang(myUserData.id, myUser.currentProject, oldLang2, lang2)
+                updateUserByLang(myUserData.id, myUser, oldLang2, lang2)
             }
 
         }).addOnFailureListener {
@@ -202,7 +202,7 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateUserByLang(user: String, project: String, old: String, new: String) {
+    private fun updateUserByLang(user: String, userModel: UserModel?, old: String, new: String) {
         myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener({
             Log.d(UserActivity::class.simpleName, "User $user deleted on $old")
         }).addOnFailureListener {
@@ -211,7 +211,9 @@ class UserActivity : AppCompatActivity() {
 
         if (new != "") {
             val userByLanguageData = HashMap<String, Any>()
-            userByLanguageData["project"] = project
+            userByLanguageData["project"] = userModel!!.currentProject
+            userByLanguageData["slackName"] = userModel.slackName
+            userByLanguageData["languages"] = userModel.language
             myDatabase.collection("UsersByLanguage").document("${new}_$user").set(userByLanguageData)
                     .addOnSuccessListener({
                         Log.d(UserActivity::class.simpleName, "User $user saved on $new")
@@ -256,9 +258,9 @@ class UserActivity : AppCompatActivity() {
                                         }
 
                                         //Delete user from UsersByLanguage
-                                        updateUserByLang(myUserData.id, ""
+                                        updateUserByLang(myUserData.id, null
                                                 , myUser.getLanguage(0), "")
-                                        updateUserByLang(myUserData.id, ""
+                                        updateUserByLang(myUserData.id, null
                                                 , myUser.getLanguage(1), "")
 
                                         myUserData.delete()
