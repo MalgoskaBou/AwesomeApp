@@ -17,6 +17,7 @@
 package com.awesomeapp.android.awesomeapp.util
 
 import android.util.Log
+import com.awesomeapp.android.awesomeapp.Refreshable
 import com.awesomeapp.android.awesomeapp.model.LanguageModel
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.TrackModel
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 /**
@@ -41,6 +43,7 @@ class QueryUtils private constructor() {
         private val languages = ArrayList<LanguageModel>()
         private var isLoaded = false
         private var getLimit = 1L
+        private var projectsActivity: Refreshable? = null
 
         /**
          * Initialise the generic data
@@ -103,6 +106,18 @@ class QueryUtils private constructor() {
 
         fun getGetLimit(): Long {
             return getLimit
+        }
+
+        fun setProjectActivity(a: Refreshable) {
+            projectsActivity = a
+        }
+
+        fun removeProjectActivity() {
+            projectsActivity = null
+        }
+
+        private fun refreshUI() {
+            projectsActivity?.refreshUI()
         }
 
         private fun loadTracks() {
@@ -182,6 +197,8 @@ class QueryUtils private constructor() {
                         }
                     }
                 }
+
+                refreshUI()
             })
         }
 
