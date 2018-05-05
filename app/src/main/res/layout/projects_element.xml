@@ -39,10 +39,11 @@
         style="@style/smallText"
         android:layout_width="@dimen/wrapConstraint"
         android:layout_marginBottom="@dimen/smallDp"
+        android:layout_marginEnd="@dimen/smallDp"
         android:layout_marginStart="@dimen/mediumMargin"
         android:text="@string/testString"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/nbOfUsersTxt"
+        app:layout_constraintEnd_toStartOf="@+id/userIcon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/projectNameTxt" />
 
@@ -51,10 +52,18 @@
         style="@style/smallText"
         android:layout_marginBottom="@dimen/smallDp"
         android:layout_marginEnd="@dimen/mediumMargin"
-        android:layout_marginStart="@dimen/smallDp"
         android:text="@string/testString"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/deadLineTxt"
-        app:layout_constraintTop_toBottomOf="@+id/projectNameTxt" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/userIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/smallDp"
+        app:layout_constraintBottom_toBottomOf="@+id/nbOfUsersTxt"
+        app:layout_constraintEnd_toStartOf="@+id/nbOfUsersTxt"
+        app:layout_constraintTop_toTopOf="@+id/nbOfUsersTxt"
+        app:srcCompat="@drawable/ic_login"
+        android:tint="@color/colorPrimaryDark"/>
 </android.support.constraint.ConstraintLayout>

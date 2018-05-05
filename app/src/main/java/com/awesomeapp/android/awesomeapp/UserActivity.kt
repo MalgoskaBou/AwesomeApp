@@ -106,6 +106,7 @@ class UserActivity : AppCompatActivity() {
                 noButton { }
             }.show()
         }
+
     }
 
     private fun ifUserIsVerified() {
@@ -165,7 +166,6 @@ class UserActivity : AppCompatActivity() {
 
         //put userdata to database (path to myUserdata is declared in getUserInfos function)
         myUserData.set(myUser).addOnSuccessListener({
-            Toast.makeText(this@UserActivity, getString(R.string.dataSaved), Toast.LENGTH_SHORT).show()
 
             var flagForceUpdateLanguage = false
             if (newProject?.id ?: "" != oldProject?.id ?: "") {
@@ -188,8 +188,11 @@ class UserActivity : AppCompatActivity() {
                 updateUserByLang(myUserData.id, myUser, oldLang2, lang2)
             }
 
+            toast(getString(R.string.dataSaved))
+            //TODO here should be intent to main activity
+
         }).addOnFailureListener {
-            Toast.makeText(this@UserActivity, getString(R.string.somethingWrong), Toast.LENGTH_SHORT).show()
+            toast(getString(R.string.somethingWrong))
         }
     }
 
