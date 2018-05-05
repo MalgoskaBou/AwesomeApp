@@ -44,11 +44,6 @@ open class MenuActivity : AppCompatActivity() {
                 addAuthListener()
                 mAuth.addAuthStateListener(mAuthStateListener)
             }
-            R.id.slack->{
-                val slackApp = Uri.parse("slack://channel?id=C94NC2CKW&team=C991Q405A-1524736492.000138")
-                val webIntent = Intent(Intent.ACTION_VIEW, slackApp)
-                startActivity(webIntent)
-            }
         }
         return super.onOptionsItemSelected(item)
     }
