@@ -25,6 +25,7 @@ import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import kotlinx.android.synthetic.main.activity_projects.*
+import kotlinx.android.synthetic.main.projects_element.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.yesButton
@@ -46,7 +47,7 @@ class ProjectsActivity : MenuActivity(), Refreshable {
         myToolbar.title = track
         setSupportActionBar(myToolbar)
 
-        rv = findViewById<RecyclerView>(R.id.projectsList)
+        rv = findViewById(R.id.projectsList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
 
         projects.addAll(QueryUtils.getProjects(track) ?: ArrayList())
