@@ -25,26 +25,86 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar_layout" />
 
-    <Spinner
-        android:id="@+id/projectsSpinner"
-        style="@style/userSpinner"
-        android:layout_height="@dimen/rowSize"
-        android:layout_marginTop="@dimen/smallDp"
+    <Button
+        android:id="@+id/deleteUserButton"
+        style="@style/buttonUserWB"
+        android:text="@string/delete_user"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/wrapConstraint"
+        android:layout_marginBottom="@dimen/smallDp"
+        app:layout_constraintBottom_toTopOf="@+id/logOutBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/actualProjectTxt" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-    <EditText
-        android:id="@+id/slackNick"
-        style="@style/userInput"
-        android:layout_width="@dimen/wrapConstraint"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/mediumDp"
-        android:hint="@string/nick_from_slack"
-        android:theme="@style/MyEditTextStyle"
-        app:layout_constraintBottom_toTopOf="@+id/language1Txt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/yourTrackTxt"
+                style="@style/userText"
+                android:text="@string/your_track" />
+
+            <Spinner
+                android:id="@+id/trackSpinner"
+                style="@style/userSpinner" />
+
+            <TextView
+                android:id="@+id/actualProjectTxt"
+                style="@style/userText"
+                android:text="@string/actual_project" />
+
+            <Spinner
+                android:id="@+id/projectsSpinner"
+                style="@style/userSpinner"
+                android:layout_height="@dimen/rowSize" />
+
+            <TextView
+                android:id="@+id/welcomeText"
+                style="@style/userText"
+                android:text="@string/welcome_message"
+                android:textAlignment="center"
+                android:layout_gravity="center" />
+
+            <EditText
+                android:id="@+id/slackNick"
+                style="@style/userInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/mediumDp"
+                android:hint="@string/nick_from_slack"
+                android:theme="@style/MyEditTextStyle" />
+
+            <TextView
+                android:id="@+id/language1Txt"
+                style="@style/userText"
+                android:text="@string/language_1" />
+
+            <Spinner
+                android:id="@+id/lang1Spinner"
+                style="@style/userSpinner" />
+
+            <TextView
+                android:id="@+id/language2Txt"
+                style="@style/userText"
+                android:text="@string/language_2" />
+
+            <Spinner
+                android:id="@+id/lang2Spinner"
+                style="@style/userSpinner" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
 
     <Button
         android:id="@+id/logOutBtn"
@@ -61,71 +121,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/logOutBtn" />
-
-    <Spinner
-        android:id="@+id/lang1Spinner"
-        style="@style/userSpinner"
-        app:layout_constraintBottom_toTopOf="@+id/language2Txt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Spinner
-        android:id="@+id/lang2Spinner"
-        style="@style/userSpinner"
-        app:layout_constraintBottom_toTopOf="@+id/yourTrackTxt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Spinner
-        android:id="@+id/trackSpinner"
-        style="@style/userSpinner"
-        app:layout_constraintBottom_toTopOf="@+id/logOutBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/actualProjectTxt"
-        style="@style/userText"
-        android:text="@string/actual_project"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
-    <TextView
-        android:id="@+id/language1Txt"
-        style="@style/userText"
-        android:text="@string/language_1"
-        app:layout_constraintBottom_toTopOf="@+id/lang1Spinner"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/language2Txt"
-        style="@style/userText"
-        android:text="@string/language_2"
-        app:layout_constraintBottom_toTopOf="@+id/lang2Spinner"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/yourTrackTxt"
-        style="@style/userText"
-        android:text="@string/your_track"
-        app:layout_constraintBottom_toTopOf="@+id/trackSpinner"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/welcomeText"
-        style="@style/userText"
-        android:text="@string/welcome_message"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/slackNick"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/deleteUserButton"
-        style="@style/buttonUserWB"
-        android:text="@string/delete_user"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
