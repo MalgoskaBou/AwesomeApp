@@ -74,8 +74,9 @@ class QueryUtils private constructor() {
         }
 
         fun getProject(track: String, project: String): ProjectsModel? {
-            return projects[track]?.filter { projectsModel -> projectsModel.name == project }
-                    ?.map { it }?.get(0)
+            val list = projects[track]?.filter { projectsModel -> projectsModel.name == project }
+                    ?.map { it }
+            return if (list != null && list.isNotEmpty()) list[0] else null
         }
 
         fun getStringProjects(track: String): ArrayList<String> {
