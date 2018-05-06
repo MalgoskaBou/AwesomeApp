@@ -34,6 +34,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
@@ -51,6 +52,9 @@ class UserActivity : AppCompatActivity() {
     private lateinit var userUid: String
 
     private var myUser: UserModel = UserModel()
+
+    //data listener
+    private lateinit var fetchDataListener: ListenerRegistration
 
     //spinner adapters
     private lateinit var spinnerAdapterTracks: ArrayAdapter<String>
@@ -106,6 +110,8 @@ class UserActivity : AppCompatActivity() {
                 noButton { }
             }.show()
         }
+
+        //TODO information when user tap on empty project spinner that first should to choice track
 
     }
 
@@ -253,6 +259,9 @@ class UserActivity : AppCompatActivity() {
                                         toast(getString(R.string.userDeleted))
                                         //Delete data from database
 
+                                        //remove fetch data snapshot listenet for do not retrive data to database
+                                        fetchDataListener.remove()
+
                                         //Decrease nbUser of the project
                                         val project = QueryUtils.getProject(myUser.userTrack
                                                 , myUser.currentProject)
@@ -270,10 +279,7 @@ class UserActivity : AppCompatActivity() {
 
                                     } else {
 
-                                        alert(getString(R.string.log_out_message_for_delete_user)) {
-                                            positiveButton(getString(R.string.ok)) { }
-                                        }.show()
-
+                                        toast(getString(R.string.log_out_message_for_delete_user))
                                         Log.e("usun usera ", "${task.exception}")
                                     }
                                 }
@@ -313,7 +319,7 @@ class UserActivity : AppCompatActivity() {
     private fun fetchUserData() {
 
         //get data from user collection
-        myUserData.addSnapshotListener(this, { snapshot, _ ->
+        fetchDataListener = myUserData.addSnapshotListener(this, { snapshot, _ ->
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
