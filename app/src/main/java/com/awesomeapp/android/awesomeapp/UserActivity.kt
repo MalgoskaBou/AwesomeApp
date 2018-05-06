@@ -78,9 +78,13 @@ class UserActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
 
         //loader window
-        myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
+        myProgressBar = indeterminateProgressDialog(getString(R.string.data_saving))
         myProgressBar?.dismiss()
-        myProgressBar?.setCancelable(false)
+        myProgressBar?.setOnCancelListener {
+            alert(getString(R.string.cancel_progressbar_info)) {
+                yesButton { startActivity<MainActivity>() }
+            }.show()
+        }
 
         // Set the listeners
         trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
