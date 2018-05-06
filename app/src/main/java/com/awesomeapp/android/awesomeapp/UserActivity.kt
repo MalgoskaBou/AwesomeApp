@@ -40,7 +40,6 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
 
 
-
 @Suppress("DEPRECATION")
 class UserActivity : AppCompatActivity() {
 
@@ -67,6 +66,7 @@ class UserActivity : AppCompatActivity() {
 
     //anko loading window - because the first connection to the database takes quite a long time
     private var myProgressBar: ProgressDialog? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -216,14 +216,17 @@ class UserActivity : AppCompatActivity() {
                 updateUserByLang(myUserData.id, myUser, oldLang2, lang2)
             }
 
-
-
             toast(getString(R.string.dataSaved))
             startActivity<MainActivity>()
 
         }).addOnFailureListener {
             toast(getString(R.string.somethingWrong))
             myProgressBar?.dismiss()
+        }
+
+        if (!QueryUtils.checkInternetConnection(this)) {
+            toast("No internet connection, your data will be saved later")
+            startActivity<MainActivity>()
         }
     }
 
