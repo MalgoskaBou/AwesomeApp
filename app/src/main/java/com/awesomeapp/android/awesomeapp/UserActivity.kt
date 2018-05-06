@@ -80,6 +80,7 @@ class UserActivity : AppCompatActivity() {
         //loader window
         myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
         myProgressBar?.dismiss()
+        myProgressBar?.setCancelable(false)
 
         // Set the listeners
         trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
@@ -149,6 +150,7 @@ class UserActivity : AppCompatActivity() {
         val oldLang1 = myUser.getLanguage(0)
         val oldLang2 = myUser.getLanguage(1)
         val oldProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
+        val oldSlackName = myUser.slackName
 
         if (slackNick.text == null || slackNick.text.toString().trim() == "") {
             myUser.slackName = getString(R.string.undefined)
@@ -202,6 +204,10 @@ class UserActivity : AppCompatActivity() {
                 }
             }
 
+            if (oldSlackName != slackNick.text.toString()) {
+                flagForceUpdateLanguage = true
+            }
+
             if (oldLang1 != lang1 || flagForceUpdateLanguage) {
                 updateUserByLang(myUserData.id, myUser, oldLang1, lang1)
             }
@@ -209,6 +215,8 @@ class UserActivity : AppCompatActivity() {
             if (oldLang2 != lang2 || flagForceUpdateLanguage) {
                 updateUserByLang(myUserData.id, myUser, oldLang2, lang2)
             }
+
+
 
             toast(getString(R.string.dataSaved))
             startActivity<MainActivity>()
