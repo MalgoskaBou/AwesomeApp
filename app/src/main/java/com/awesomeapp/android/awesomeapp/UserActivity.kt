@@ -195,11 +195,11 @@ class UserActivity : AppCompatActivity() {
             }
 
             toast(getString(R.string.dataSaved))
-            //TODO here should be intent to main activity
 
         }).addOnFailureListener {
             toast(getString(R.string.somethingWrong))
         }
+        startActivity<MainActivity>()
     }
 
     private fun updateProject(project: ProjectsModel, value: Long) {
