@@ -40,7 +40,6 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
 
 
-
 @Suppress("DEPRECATION")
 class UserActivity : AppCompatActivity() {
 
@@ -68,6 +67,7 @@ class UserActivity : AppCompatActivity() {
     //anko loading window - because the first connection to the database takes quite a long time
     private var myProgressBar: ProgressDialog? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
@@ -80,6 +80,7 @@ class UserActivity : AppCompatActivity() {
         //loader window
         myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
         myProgressBar?.dismiss()
+        myProgressBar?.setCancelable(false)
 
         // Set the listeners
         trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
@@ -149,6 +150,7 @@ class UserActivity : AppCompatActivity() {
         val oldLang1 = myUser.getLanguage(0)
         val oldLang2 = myUser.getLanguage(1)
         val oldProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
+        val oldSlackName = myUser.slackName
 
         if (slackNick.text == null || slackNick.text.toString().trim() == "") {
             myUser.slackName = getString(R.string.undefined)
@@ -202,6 +204,10 @@ class UserActivity : AppCompatActivity() {
                 }
             }
 
+            if (oldSlackName != slackNick.text.toString()) {
+                flagForceUpdateLanguage = true
+            }
+
             if (oldLang1 != lang1 || flagForceUpdateLanguage) {
                 updateUserByLang(myUserData.id, myUser, oldLang1, lang1)
             }
@@ -216,6 +222,11 @@ class UserActivity : AppCompatActivity() {
         }).addOnFailureListener {
             toast(getString(R.string.somethingWrong))
             myProgressBar?.dismiss()
+        }
+
+        if (!QueryUtils.checkInternetConnection(this)) {
+            toast("No internet connection, your data will be saved later")
+            startActivity<MainActivity>()
         }
     }
 
