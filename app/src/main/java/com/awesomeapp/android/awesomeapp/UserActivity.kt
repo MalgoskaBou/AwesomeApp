@@ -16,6 +16,7 @@
 
 package com.awesomeapp.android.awesomeapp
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -23,7 +24,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
@@ -34,10 +34,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
 
+
+
+@Suppress("DEPRECATION")
 class UserActivity : AppCompatActivity() {
 
     //hooks to database
@@ -52,11 +56,17 @@ class UserActivity : AppCompatActivity() {
 
     private var myUser: UserModel = UserModel()
 
+    //data listener
+    private lateinit var fetchDataListener: ListenerRegistration
+
     //spinner adapters
     private lateinit var spinnerAdapterTracks: ArrayAdapter<String>
     private lateinit var spinnerAdapterLanguages1: ArrayAdapter<String>
     private lateinit var spinnerAdapterLanguages2: ArrayAdapter<String>
     private val spinnerAdapterProjects: HashMap<String, ArrayAdapter<String>> = HashMap()
+
+    //anko loading window - because the first connection to the database takes quite a long time
+    private var myProgressBar: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +76,10 @@ class UserActivity : AppCompatActivity() {
         //get database hook
         myDatabase = FirebaseFirestore.getInstance()
         mAuth = FirebaseAuth.getInstance()
+
+        //loader window
+        myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
+        myProgressBar?.dismiss()
 
         // Set the listeners
         trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
@@ -107,6 +121,13 @@ class UserActivity : AppCompatActivity() {
             }.show()
         }
 
+        //information for the user that have to first select the track and then the project
+        projectsSpinner.setOnTouchListener({ _, _ ->
+            if (projectsSpinner.adapter == null) {
+                toast(getString(R.string.choose_your_track_first))
+            }
+            false
+        })
     }
 
     private fun ifUserIsVerified() {
@@ -118,7 +139,6 @@ class UserActivity : AppCompatActivity() {
             alert(getString(R.string.verifyEmail)) {
                 positiveButton(getString(R.string.sendLink)) { mAuth.currentUser?.sendEmailVerification() }
                 negativeButton(getString(R.string.refresh)) { mAuth.currentUser?.reload() }
-
             }.show()
         }
     }
@@ -164,6 +184,8 @@ class UserActivity : AppCompatActivity() {
             newProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
         }
 
+        myProgressBar?.show()
+
         //put userdata to database (path to myUserdata is declared in getUserInfos function)
         myUserData.set(myUser).addOnSuccessListener({
 
@@ -189,10 +211,11 @@ class UserActivity : AppCompatActivity() {
             }
 
             toast(getString(R.string.dataSaved))
-            //TODO here should be intent to main activity
+            startActivity<MainActivity>()
 
         }).addOnFailureListener {
             toast(getString(R.string.somethingWrong))
+            myProgressBar?.dismiss()
         }
     }
 
@@ -253,6 +276,9 @@ class UserActivity : AppCompatActivity() {
                                         toast(getString(R.string.userDeleted))
                                         //Delete data from database
 
+                                        //remove fetch data snapshot listenet for do not retrive data to database
+                                        fetchDataListener.remove()
+
                                         //Decrease nbUser of the project
                                         val project = QueryUtils.getProject(myUser.userTrack
                                                 , myUser.currentProject)
@@ -270,10 +296,7 @@ class UserActivity : AppCompatActivity() {
 
                                     } else {
 
-                                        alert(getString(R.string.log_out_message_for_delete_user)) {
-                                            positiveButton(getString(R.string.ok)) { }
-                                        }.show()
-
+                                        toast(getString(R.string.log_out_message_for_delete_user))
                                         Log.e("usun usera ", "${task.exception}")
                                     }
                                 }
@@ -313,7 +336,7 @@ class UserActivity : AppCompatActivity() {
     private fun fetchUserData() {
 
         //get data from user collection
-        myUserData.addSnapshotListener(this, { snapshot, _ ->
+        fetchDataListener = myUserData.addSnapshotListener(this, { snapshot, _ ->
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
