@@ -23,7 +23,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.awesomeapp.android.awesomeapp.data.Constant.SLACK_NAME
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
@@ -38,6 +37,8 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
+
+
 
 class UserActivity : AppCompatActivity() {
 
@@ -111,7 +112,13 @@ class UserActivity : AppCompatActivity() {
             }.show()
         }
 
-        //TODO information when user tap on empty project spinner that first should to choice track
+        //information for the user that have to first select the track and then the project
+        projectsSpinner.setOnTouchListener({ _, _ ->
+            if (projectsSpinner.adapter == null) {
+                toast(getString(R.string.choose_your_track_first))
+            }
+            false
+        })
 
     }
 

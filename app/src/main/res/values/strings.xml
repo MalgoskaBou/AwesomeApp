@@ -61,6 +61,7 @@
     <string name="waitingMessage">Wait for data loading</string>
     <string name="deadline">Deadline: </string>
     <string name="refresh_data_by_swip">Refresh data by swip</string>
+    <string name="choose_your_track_first">choose your track first</string>
 
 
 </resources>
