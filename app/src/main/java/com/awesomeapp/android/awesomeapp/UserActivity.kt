@@ -16,6 +16,7 @@
 
 package com.awesomeapp.android.awesomeapp
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -40,6 +41,7 @@ import org.jetbrains.anko.*
 
 
 
+@Suppress("DEPRECATION")
 class UserActivity : AppCompatActivity() {
 
     //hooks to database
@@ -63,6 +65,9 @@ class UserActivity : AppCompatActivity() {
     private lateinit var spinnerAdapterLanguages2: ArrayAdapter<String>
     private val spinnerAdapterProjects: HashMap<String, ArrayAdapter<String>> = HashMap()
 
+    //anko loading window - because the first connection to the database takes quite a long time
+    private var myProgressBar: ProgressDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
@@ -71,6 +76,10 @@ class UserActivity : AppCompatActivity() {
         //get database hook
         myDatabase = FirebaseFirestore.getInstance()
         mAuth = FirebaseAuth.getInstance()
+
+        //loader window
+        myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
+        myProgressBar?.dismiss()
 
         // Set the listeners
         trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
@@ -119,7 +128,6 @@ class UserActivity : AppCompatActivity() {
             }
             false
         })
-
     }
 
     private fun ifUserIsVerified() {
@@ -131,7 +139,6 @@ class UserActivity : AppCompatActivity() {
             alert(getString(R.string.verifyEmail)) {
                 positiveButton(getString(R.string.sendLink)) { mAuth.currentUser?.sendEmailVerification() }
                 negativeButton(getString(R.string.refresh)) { mAuth.currentUser?.reload() }
-
             }.show()
         }
     }
@@ -177,6 +184,8 @@ class UserActivity : AppCompatActivity() {
             newProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
         }
 
+        myProgressBar?.show()
+
         //put userdata to database (path to myUserdata is declared in getUserInfos function)
         myUserData.set(myUser).addOnSuccessListener({
 
@@ -202,11 +211,12 @@ class UserActivity : AppCompatActivity() {
             }
 
             toast(getString(R.string.dataSaved))
+            startActivity<MainActivity>()
 
         }).addOnFailureListener {
             toast(getString(R.string.somethingWrong))
+            myProgressBar?.dismiss()
         }
-        startActivity<MainActivity>()
     }
 
     private fun updateProject(project: ProjectsModel, value: Long) {
