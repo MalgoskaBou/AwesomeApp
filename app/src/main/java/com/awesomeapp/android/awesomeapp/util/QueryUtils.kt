@@ -171,6 +171,7 @@ class QueryUtils private constructor() {
 
         private fun loadProjects() {
             val projectsCollection = FirebaseFirestore.getInstance().collection("Projects")
+                    .orderBy("order")
 
             projectsCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
                 if (e != null) {
