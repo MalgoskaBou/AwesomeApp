@@ -52,8 +52,6 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
     private var adapter = UserAdapter(users)
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
-    //    private lateinit var deadlineExtra: String
-//    private lateinit var nbUsersExtra: String
     private lateinit var rv: RecyclerView
     private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout

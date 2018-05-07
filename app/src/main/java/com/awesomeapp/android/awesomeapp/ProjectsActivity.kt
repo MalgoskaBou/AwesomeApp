@@ -83,8 +83,8 @@ class ProjectsActivity : MenuActivity(), ProjectRefreshable {
 
     override fun refreshUI(p: ProjectsModel) {
         projects.clear()
-        rv.removeAllViews()
         projects.addAll(QueryUtils.getProjects(track) ?: ArrayList())
+        rv.adapter.notifyDataSetChanged()
     }
 }
 
