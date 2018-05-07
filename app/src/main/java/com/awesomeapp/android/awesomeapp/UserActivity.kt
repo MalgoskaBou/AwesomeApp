@@ -393,7 +393,7 @@ class UserActivity : AppCompatActivity() {
         for (track in tracks) {
             val projects = QueryUtils.getStringProjects(track)
             projects.add(0, getString(R.string.selectProject))
-            spinnerAdapterProjects[track] = ArrayAdapter(applicationContext,
+            spinnerAdapterProjects[track] = ArrayAdapter(this,
                     android.R.layout.simple_spinner_item, projects)
         }
 
