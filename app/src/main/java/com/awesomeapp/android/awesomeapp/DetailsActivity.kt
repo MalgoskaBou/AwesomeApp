@@ -33,6 +33,7 @@ import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_DEADLINE
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_NB_USERS
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
+import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import com.google.firebase.firestore.DocumentSnapshot
@@ -45,14 +46,14 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 
-class DetailsActivity : MenuActivity() {
+class DetailsActivity : MenuActivity(), ProjectRefreshable {
 
     private var users: ArrayList<UserModel> = ArrayList()
     private var adapter = UserAdapter(users)
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
-    private lateinit var deadlineExtra: String
-    private lateinit var nbUsersExtra: String
+    //    private lateinit var deadlineExtra: String
+//    private lateinit var nbUsersExtra: String
     private lateinit var rv: RecyclerView
     private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout
@@ -65,8 +66,8 @@ class DetailsActivity : MenuActivity() {
 
         val intent = intent
         projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
-        deadlineExtra = intent.getStringExtra(WHICH_DEADLINE)
-        nbUsersExtra = intent.getStringExtra(WHICH_NB_USERS)
+        val deadlineExtra = intent.getStringExtra(WHICH_DEADLINE)
+        val nbUsersExtra = intent.getStringExtra(WHICH_NB_USERS)
 
         projectNameTxt.text = projectNameExtra
         deadLineTxt.text = deadlineExtra
@@ -86,6 +87,13 @@ class DetailsActivity : MenuActivity() {
         swipeLayout.setOnRefreshListener({
             loadMoreUsers()
         })
+
+        QueryUtils.addProjectRefreshableActivity(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        QueryUtils.removeProjectRefreshableActivity(this)
     }
 
     /**
@@ -248,5 +256,11 @@ class DetailsActivity : MenuActivity() {
         noOneWorkCurrently.visibility = View.GONE
         users.clear()
         rv.removeAllViews()
+    }
+
+    override fun refreshUI(p: ProjectsModel) {
+        if (p.name == projectNameExtra) {
+            nbOfUsersTxt.text = p.nbUsers.toString()
+        }
     }
 }

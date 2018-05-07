@@ -30,7 +30,7 @@ import org.jetbrains.anko.alert
 import org.jetbrains.anko.yesButton
 
 
-class ProjectsActivity : MenuActivity(), Refreshable {
+class ProjectsActivity : MenuActivity(), ProjectRefreshable {
 
     private var projects: ArrayList<ProjectsModel> = ArrayList()
     private lateinit var rv: RecyclerView
@@ -81,13 +81,13 @@ class ProjectsActivity : MenuActivity(), Refreshable {
         QueryUtils.removeProjectRefreshableActivity(this)
     }
 
-    override fun refreshUI() {
+    override fun refreshUI(p: ProjectsModel) {
         projects.clear()
         rv.removeAllViews()
         projects.addAll(QueryUtils.getProjects(track) ?: ArrayList())
     }
 }
 
-interface Refreshable {
-    fun refreshUI()
+interface ProjectRefreshable {
+    fun refreshUI(p: ProjectsModel)
 }

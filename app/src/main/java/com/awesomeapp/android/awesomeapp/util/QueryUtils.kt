@@ -19,7 +19,7 @@ package com.awesomeapp.android.awesomeapp.util
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
-import com.awesomeapp.android.awesomeapp.Refreshable
+import com.awesomeapp.android.awesomeapp.ProjectRefreshable
 import com.awesomeapp.android.awesomeapp.model.LanguageModel
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.TrackModel
@@ -45,7 +45,7 @@ class QueryUtils private constructor() {
         private val languages = ArrayList<LanguageModel>()
         private var isLoaded = false
         private var getLimit = 1L
-        private var projectsActivity = ArrayList<Refreshable>()
+        private var projectsActivity = ArrayList<ProjectRefreshable>()
 
 
         /**
@@ -122,16 +122,16 @@ class QueryUtils private constructor() {
             return getLimit
         }
 
-        fun addProjectRefreshableActivity(a: Refreshable) {
+        fun addProjectRefreshableActivity(a: ProjectRefreshable) {
             projectsActivity.add(a)
         }
 
-        fun removeProjectRefreshableActivity(a: Refreshable) {
+        fun removeProjectRefreshableActivity(a: ProjectRefreshable) {
             projectsActivity.remove(a)
         }
 
-        private fun refreshUI() {
-            projectsActivity.map { a -> a.refreshUI() }
+        private fun refreshUI(p: ProjectsModel) {
+            projectsActivity.map { a -> a.refreshUI(p) }
         }
 
         private fun loadTracks() {
@@ -181,10 +181,11 @@ class QueryUtils private constructor() {
                 if (snapshots == null) return@EventListener
 
                 for (dc in snapshots.documentChanges) {
+                    val projectObj = dc.document.toObject(ProjectsModel::class.java)
                     when (dc.type) {
                         DocumentChange.Type.ADDED -> {
                             Log.d(QueryUtils::class.simpleName, "New project: " + dc.document.data)
-                            val projectObj = dc.document.toObject(ProjectsModel::class.java)
+
                             projectObj.id = dc.document.id
                             val track = dc.document.id.split("_")[0]
                             val projectsByTrack = projects[track] ?: ArrayList()
@@ -210,9 +211,8 @@ class QueryUtils private constructor() {
                             projectsByTrack.removeAt(projectsByTrack.indexOf(project))
                         }
                     }
+                    refreshUI(projectObj)
                 }
-
-                refreshUI()
             })
         }
 
