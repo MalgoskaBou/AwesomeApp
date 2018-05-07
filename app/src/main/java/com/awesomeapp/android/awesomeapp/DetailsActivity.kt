@@ -36,6 +36,7 @@ import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath.documentId
 import com.google.firebase.firestore.FirebaseFirestore
@@ -152,11 +153,33 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
     private fun getUsers(query: Query) {
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
-                for (document in snapshots) {
-                    val user = document.toObject(UserModel::class.java)
-
-                    rv.removeAllViews()
-                    users.add(user)
+                for (dc in snapshots.documentChanges) {
+                    val user = dc.document.toObject(UserModel::class.java)
+                    Log.d(DetailsActivity::class.simpleName, "Process User $user")
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            Log.d(DetailsActivity::class.simpleName, "Add User $dc.document.id")
+                            users.add(user)
+                            rv.adapter.notifyItemInserted(users.size - 1)
+                        }
+                        DocumentChange.Type.MODIFIED -> {
+                            Log.d(DetailsActivity::class.simpleName, "Modify User $dc.document.id")
+                            val listUser = users.filter { it.slackName == dc.document["slackName"] }
+                            if (listUser.isNotEmpty()) {
+                                val index = users.indexOf(listUser[0])
+                                users.removeAt(index)
+                                users.add(index, user)
+                            }
+                            rv.adapter.notifyDataSetChanged()
+                        }
+                        DocumentChange.Type.REMOVED -> {
+                            Log.d(DetailsActivity::class.simpleName, "Remove User $dc.document.id")
+                            val index = users.indexOf(user)
+                            users.removeAt(index)
+                            rv.adapter.notifyItemRemoved(index)
+                            rv.adapter.notifyItemRangeChanged(index, users.size)
+                        }
+                    }
                 }
 
                 lastVisible = snapshots.documents[snapshots.size() - 1]
@@ -184,15 +207,35 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
 
         query.addSnapshotListener(this, { snapshots, e ->
             if (snapshots?.size()!! > 0) {
-                for (document in snapshots) {
-                    Log.d(DetailsActivity::class.simpleName, "User $document.id")
-
-                    val user = UserModel(document["project"] as String? ?: ""
-                            , document["languages"] as String? ?: ""
-                            , document["slackName"] as String? ?: "", "")
-
-                        rv.removeAllViews()
-                        users.add(user)
+                for (dc in snapshots.documentChanges) {
+                    val user = UserModel(dc.document["project"] as String? ?: ""
+                            , dc.document["languages"] as String? ?: ""
+                            , dc.document["slackName"] as String? ?: "", "")
+                    Log.d(DetailsActivity::class.simpleName, "Process User $user")
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            Log.d(DetailsActivity::class.simpleName, "Add User $dc.document.id")
+                            users.add(user)
+                            rv.adapter.notifyItemInserted(users.size - 1)
+                        }
+                        DocumentChange.Type.MODIFIED -> {
+                            Log.d(DetailsActivity::class.simpleName, "Modify User $dc.document.id")
+                            val listUser = users.filter { it.slackName == dc.document["slackName"] }
+                            if (listUser.isNotEmpty()) {
+                                val index = users.indexOf(listUser[0])
+                                users.removeAt(index)
+                                users.add(index, user)
+                            }
+                            rv.adapter.notifyDataSetChanged()
+                        }
+                        DocumentChange.Type.REMOVED -> {
+                            Log.d(DetailsActivity::class.simpleName, "Remove User $dc.document.id")
+                            val index = users.indexOf(user)
+                            users.removeAt(index)
+                            rv.adapter.notifyItemRemoved(index)
+                            rv.adapter.notifyItemRangeChanged(index, users.size)
+                        }
+                    }
                 }
                 lastVisible = snapshots.documents[snapshots.size() - 1]
             } else {
@@ -203,6 +246,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
                 swipeLayout.isRefreshing = false
                 Log.e("Event ", e.toString())
             }
+            rv.adapter.notifyDataSetChanged()
             myProgressBar?.dismiss()
             swipeLayout.isRefreshing = false
         })
