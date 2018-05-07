@@ -16,6 +16,8 @@
 
 package com.awesomeapp.android.awesomeapp.util
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
 import com.awesomeapp.android.awesomeapp.Refreshable
 import com.awesomeapp.android.awesomeapp.model.LanguageModel
@@ -44,6 +46,17 @@ class QueryUtils private constructor() {
         private var isLoaded = false
         private var getLimit = 1L
         private var projectsActivity: Refreshable? = null
+
+
+        /**
+         * Check internet connection
+         */
+        fun checkInternetConnection(context: Context): Boolean {
+            //check connection with internet
+            val connMgr = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connMgr.activeNetworkInfo
+            return networkInfo != null && networkInfo.isConnected
+        }
 
         /**
          * Initialise the generic data
