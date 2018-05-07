@@ -219,6 +219,7 @@ class QueryUtils private constructor() {
 
         private fun loadLanguages() {
             val languageCollection = FirebaseFirestore.getInstance().collection("Languages")
+                    .orderBy("name")
 
             languageCollection.addSnapshotListener(EventListener<QuerySnapshot> { snapshots, e ->
                 if (e != null) {
