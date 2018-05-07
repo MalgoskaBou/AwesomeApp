@@ -45,7 +45,7 @@ class QueryUtils private constructor() {
         private val languages = ArrayList<LanguageModel>()
         private var isLoaded = false
         private var getLimit = 1L
-        private var projectsActivity: Refreshable? = null
+        private var projectsActivity = ArrayList<Refreshable>()
 
 
         /**
@@ -122,16 +122,16 @@ class QueryUtils private constructor() {
             return getLimit
         }
 
-        fun setProjectActivity(a: Refreshable) {
-            projectsActivity = a
+        fun addProjectRefreshableActivity(a: Refreshable) {
+            projectsActivity.add(a)
         }
 
-        fun removeProjectActivity() {
-            projectsActivity = null
+        fun removeProjectRefreshableActivity(a: Refreshable) {
+            projectsActivity.remove(a)
         }
 
         private fun refreshUI() {
-            projectsActivity?.refreshUI()
+            projectsActivity.map { a -> a.refreshUI() }
         }
 
         private fun loadTracks() {
