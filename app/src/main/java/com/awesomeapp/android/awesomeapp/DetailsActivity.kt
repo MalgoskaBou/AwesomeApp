@@ -36,11 +36,8 @@ import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
 import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
-import com.google.firebase.firestore.DocumentChange
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.FieldPath.documentId
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
@@ -57,6 +54,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
     private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout
     private var isLoading = false
+    private var isAllLoaded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +113,6 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
     private fun loadUsers() {
         isLoading = true
         val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
-                .limit(QueryUtils.getGetLimit())
         getUsers(query)
     }
 
@@ -123,8 +120,8 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
      * Load more users
      */
     private fun loadMoreUsers() {
-        if (lastVisible != null) {
-
+        if (lastVisible != null && !isAllLoaded) {
+            isLoading = true
             if (languageSpinner.selectedItemPosition > 0) {
                 val lang = languageSpinner.selectedItem.toString()
 
@@ -132,14 +129,11 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
                         .whereGreaterThanOrEqualTo(documentId(), lang)
                         .whereLessThan(documentId(), lang + "a")
                         .whereEqualTo("project", projectNameExtra)
-                        .startAfter(lastVisible!!)
-                        .limit(QueryUtils.getGetLimit())
 
-                getUsersFiltered(query)
+                getUsers(query)
             } else {
-                val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
-                        .startAfter(lastVisible!!).limit(QueryUtils.getGetLimit())
-                getUsers(newQuery)
+                val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
+                getUsers(query)
             }
         } else {
             toast(getString(R.string.nothingToLoad))
@@ -151,105 +145,102 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
      * Get the users from the database
      */
     private fun getUsers(query: Query) {
-        query.addSnapshotListener(this, { snapshots, e ->
-            if (snapshots?.size()!! > 0) {
-                for (dc in snapshots.documentChanges) {
-                    val user = dc.document.toObject(UserModel::class.java)
-                    Log.d(DetailsActivity::class.simpleName, "Process User $user")
-                    when (dc.type) {
-                        DocumentChange.Type.ADDED -> {
-                            Log.d(DetailsActivity::class.simpleName, "Add User $dc.document.id")
-                            users.add(user)
-                            rv.adapter.notifyItemInserted(users.size - 1)
+        //First we should get the first and last documents of the query
+        var tmpQuery = query
+        if (lastVisible != null) {
+            tmpQuery = tmpQuery.startAfter(lastVisible!!)
+        }
+        tmpQuery.limit(QueryUtils.getGetLimit())
+                .get().addOnSuccessListener {
+                    if (it.documents.isNotEmpty()) {
+                        val firstItem = it.documents[0]
+                        val lastItem = it.documents[it.documents.size - 1]
+
+                        if (lastVisible == null) {
+                            //We should listen before the first item in case a new user is inserted
+                            query.endBefore(firstItem)
+                                    .addSnapshotListener(this, usersListener)
+                        } else {
+                            // We should listen between previous user and new first user
+                            query.startAfter(lastVisible!!)
+                                    .endBefore(firstItem)
+                                    .addSnapshotListener(this, usersListener)
                         }
-                        DocumentChange.Type.MODIFIED -> {
-                            Log.d(DetailsActivity::class.simpleName, "Modify User $dc.document.id")
-                            val listUser = users.filter { it.slackName == dc.document["slackName"] }
-                            if (listUser.isNotEmpty()) {
-                                val index = users.indexOf(listUser[0])
-                                users.removeAt(index)
-                                users.add(index, user)
-                            }
-                            rv.adapter.notifyDataSetChanged()
+
+                        // We memorise the last visible user
+                        lastVisible = lastItem
+
+                        query.startAt(firstItem).endAt(lastItem)
+                                .addSnapshotListener(this, usersListener)
+                    } else {
+                        myProgressBar?.dismiss()
+                        if (lastVisible != null) {
+                            // We should listen after the first item in case a new user is inserted
+                            query.startAfter(lastVisible!!)
+                                    .addSnapshotListener(this, usersListener)
+                            isAllLoaded = true
                         }
-                        DocumentChange.Type.REMOVED -> {
-                            Log.d(DetailsActivity::class.simpleName, "Remove User $dc.document.id")
-                            val index = users.indexOf(user)
-                            users.removeAt(index)
-                            rv.adapter.notifyItemRemoved(index)
-                            rv.adapter.notifyItemRangeChanged(index, users.size)
+
+                        toast(getString(R.string.nothingToLoad))
+                        swipeLayout.isRefreshing = false
+                        isLoading = false
+
+                        if (users.size == 0) {
+                            noOneWorkCurrently.visibility = View.VISIBLE
                         }
                     }
                 }
-
-                lastVisible = snapshots.documents[snapshots.size() - 1]
-                isLoading = false
-            } else {
-                toast(getString(R.string.nothingToLoad))
-                swipeLayout.isRefreshing = false
-                Log.e("Event ", e.toString())
-                isLoading = false
-            }
-            myProgressBar?.dismiss()
-            swipeLayout.isRefreshing = false
-
-            if (users.size == 0) {
-                noOneWorkCurrently.visibility = View.VISIBLE
-            }
-        })
+                .addOnFailureListener {
+                    toast(getString(R.string.errorLoading))
+                    swipeLayout.isRefreshing = false
+                    Log.e("Event ", it.toString())
+                    isLoading = false
+                }
     }
 
-    /**
-     * Get the users from the database filtered by language
-     */
-    private fun getUsersFiltered(query: Query) {
-        myProgressBar?.show()
-
-        query.addSnapshotListener(this, { snapshots, e ->
-            if (snapshots?.size()!! > 0) {
-                for (dc in snapshots.documentChanges) {
-                    val user = UserModel(dc.document["project"] as String? ?: ""
-                            , dc.document["languages"] as String? ?: ""
-                            , dc.document["slackName"] as String? ?: "", "")
-                    Log.d(DetailsActivity::class.simpleName, "Process User $user")
-                    when (dc.type) {
-                        DocumentChange.Type.ADDED -> {
-                            Log.d(DetailsActivity::class.simpleName, "Add User $dc.document.id")
-                            users.add(user)
-                            rv.adapter.notifyItemInserted(users.size - 1)
+    private val usersListener = EventListener<QuerySnapshot> { snapshots, _ ->
+        if (snapshots != null && snapshots.documentChanges.size > 0) {
+            for (dc in snapshots.documentChanges) {
+                val user =
+                        if (languageSpinner.selectedItemPosition > 0) {
+                            UserModel(dc.document["project"] as String? ?: ""
+                                    , dc.document["languages"] as String? ?: ""
+                                    , dc.document["slackName"] as String? ?: "", "")
+                        } else {
+                            dc.document.toObject(UserModel::class.java)
                         }
-                        DocumentChange.Type.MODIFIED -> {
-                            Log.d(DetailsActivity::class.simpleName, "Modify User $dc.document.id")
-                            val listUser = users.filter { it.slackName == dc.document["slackName"] }
-                            if (listUser.isNotEmpty()) {
-                                val index = users.indexOf(listUser[0])
-                                users.removeAt(index)
-                                users.add(index, user)
-                            }
-                            rv.adapter.notifyDataSetChanged()
-                        }
-                        DocumentChange.Type.REMOVED -> {
-                            Log.d(DetailsActivity::class.simpleName, "Remove User $dc.document.id")
-                            val index = users.indexOf(user)
+                Log.d(DetailsActivity::class.simpleName, "Process User $user")
+                when (dc.type) {
+                    DocumentChange.Type.ADDED -> {
+                        Log.d(DetailsActivity::class.simpleName, "Add User")
+                        users.add(user)
+                        rv.adapter.notifyItemInserted(users.size - 1)
+                    }
+                    DocumentChange.Type.MODIFIED -> {
+                        Log.d(DetailsActivity::class.simpleName, "Modify User")
+                        val listUser = users.filter { it.slackName == dc.document["slackName"] }
+                        if (listUser.isNotEmpty()) {
+                            val index = users.indexOf(listUser[0])
                             users.removeAt(index)
-                            rv.adapter.notifyItemRemoved(index)
-                            rv.adapter.notifyItemRangeChanged(index, users.size)
+                            users.add(index, user)
                         }
+                        rv.adapter.notifyDataSetChanged()
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        Log.d(DetailsActivity::class.simpleName, "Remove User")
+                        val index = users.indexOf(user)
+                        users.removeAt(index)
+                        rv.adapter.notifyItemRemoved(index)
+                        rv.adapter.notifyItemRangeChanged(index, users.size)
                     }
                 }
-                lastVisible = snapshots.documents[snapshots.size() - 1]
-            } else {
-                if (users.size == 0) {
-                    noOneWorkCurrently.visibility = View.VISIBLE
-                }
-                toast(getString(R.string.nothingToLoad))
-                swipeLayout.isRefreshing = false
-                Log.e("Event ", e.toString())
             }
-            rv.adapter.notifyDataSetChanged()
-            myProgressBar?.dismiss()
-            swipeLayout.isRefreshing = false
-        })
+            isLoading = false
+        } else {
+//            Never goes there as size is checked before
+        }
+        myProgressBar?.dismiss()
+        swipeLayout.isRefreshing = false
     }
 
     /**
@@ -275,6 +266,9 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
             clearUsers()
         }
 
+        lastVisible = null
+        isAllLoaded = false
+
         // If a language is selected
         if (languageSpinner.selectedItemPosition > 0) {
             val lang = languageSpinner.selectedItem.toString()
@@ -285,7 +279,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
                     .whereEqualTo("project", projectNameExtra)
                     .limit(QueryUtils.getGetLimit())
 
-            getUsersFiltered(query)
+            getUsers(query)
         } else {
             loadUsers()
         }
