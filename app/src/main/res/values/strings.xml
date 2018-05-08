@@ -64,6 +64,7 @@
     <string name="choose_your_track_first">choose your track first</string>
     <string name="data_saving">Data saving, it may take a few seconds</string>
     <string name="cancel_progressbar_info">The data will be saved in a moment, do you want to return to the main screen?</string>
+    <string name="errorLoading">Error while loading data</string>
 
 
 </resources>

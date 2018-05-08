@@ -33,30 +33,28 @@ import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_DEADLINE
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_NB_USERS
 import com.awesomeapp.android.awesomeapp.data.Constant.WHICH_PROJECT
 import com.awesomeapp.android.awesomeapp.data.Constant.myUsers
+import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.FieldPath.documentId
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 
-class DetailsActivity : MenuActivity() {
+class DetailsActivity : MenuActivity(), ProjectRefreshable {
 
     private var users: ArrayList<UserModel> = ArrayList()
     private var adapter = UserAdapter(users)
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
-    private lateinit var deadlineExtra: String
-    private lateinit var nbUsersExtra: String
     private lateinit var rv: RecyclerView
     private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout
     private var isLoading = false
+    private var isAllLoaded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,8 +63,8 @@ class DetailsActivity : MenuActivity() {
 
         val intent = intent
         projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
-        deadlineExtra = intent.getStringExtra(WHICH_DEADLINE)
-        nbUsersExtra = intent.getStringExtra(WHICH_NB_USERS)
+        val deadlineExtra = intent.getStringExtra(WHICH_DEADLINE)
+        val nbUsersExtra = intent.getStringExtra(WHICH_NB_USERS)
 
         projectNameTxt.text = projectNameExtra
         deadLineTxt.text = deadlineExtra
@@ -86,6 +84,13 @@ class DetailsActivity : MenuActivity() {
         swipeLayout.setOnRefreshListener({
             loadMoreUsers()
         })
+
+        QueryUtils.addProjectRefreshableActivity(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        QueryUtils.removeProjectRefreshableActivity(this)
     }
 
     /**
@@ -108,7 +113,6 @@ class DetailsActivity : MenuActivity() {
     private fun loadUsers() {
         isLoading = true
         val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
-                .limit(QueryUtils.getGetLimit())
         getUsers(query)
     }
 
@@ -116,8 +120,8 @@ class DetailsActivity : MenuActivity() {
      * Load more users
      */
     private fun loadMoreUsers() {
-        if (lastVisible != null) {
-
+        if (lastVisible != null && !isAllLoaded) {
+            isLoading = true
             if (languageSpinner.selectedItemPosition > 0) {
                 val lang = languageSpinner.selectedItem.toString()
 
@@ -125,14 +129,11 @@ class DetailsActivity : MenuActivity() {
                         .whereGreaterThanOrEqualTo(documentId(), lang)
                         .whereLessThan(documentId(), lang + "a")
                         .whereEqualTo("project", projectNameExtra)
-                        .startAfter(lastVisible!!)
-                        .limit(QueryUtils.getGetLimit())
 
-                getUsersFiltered(query)
+                getUsers(query)
             } else {
-                val newQuery = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
-                        .startAfter(lastVisible!!).limit(QueryUtils.getGetLimit())
-                getUsers(newQuery)
+                val query = myUsers.whereEqualTo(CURRENT_PROJECT, projectNameExtra)
+                getUsers(query)
             }
         } else {
             toast(getString(R.string.nothingToLoad))
@@ -144,62 +145,102 @@ class DetailsActivity : MenuActivity() {
      * Get the users from the database
      */
     private fun getUsers(query: Query) {
-        query.addSnapshotListener(this, { snapshots, e ->
-            if (snapshots?.size()!! > 0) {
-                for (document in snapshots) {
-                    val user = document.toObject(UserModel::class.java)
+        //First we should get the first and last documents of the query
+        var tmpQuery = query
+        if (lastVisible != null) {
+            tmpQuery = tmpQuery.startAfter(lastVisible!!)
+        }
+        tmpQuery.limit(QueryUtils.getGetLimit())
+                .get().addOnSuccessListener {
+                    if (it.documents.isNotEmpty()) {
+                        val firstItem = it.documents[0]
+                        val lastItem = it.documents[it.documents.size - 1]
 
-                    rv.removeAllViews()
-                    users.add(user)
+                        if (lastVisible == null) {
+                            //We should listen before the first item in case a new user is inserted
+                            query.endBefore(firstItem)
+                                    .addSnapshotListener(this, usersListener)
+                        } else {
+                            // We should listen between previous user and new first user
+                            query.startAfter(lastVisible!!)
+                                    .endBefore(firstItem)
+                                    .addSnapshotListener(this, usersListener)
+                        }
+
+                        // We memorise the last visible user
+                        lastVisible = lastItem
+
+                        query.startAt(firstItem).endAt(lastItem)
+                                .addSnapshotListener(this, usersListener)
+                    } else {
+                        myProgressBar?.dismiss()
+                        if (lastVisible != null) {
+                            // We should listen after the first item in case a new user is inserted
+                            query.startAfter(lastVisible!!)
+                                    .addSnapshotListener(this, usersListener)
+                            isAllLoaded = true
+                        }
+
+                        toast(getString(R.string.nothingToLoad))
+                        swipeLayout.isRefreshing = false
+                        isLoading = false
+
+                        if (users.size == 0) {
+                            noOneWorkCurrently.visibility = View.VISIBLE
+                        }
+                    }
                 }
-
-                lastVisible = snapshots.documents[snapshots.size() - 1]
-                isLoading = false
-            } else {
-                toast(getString(R.string.nothingToLoad))
-                swipeLayout.isRefreshing = false
-                Log.e("Event ", e.toString())
-                isLoading = false
-            }
-            myProgressBar?.dismiss()
-            swipeLayout.isRefreshing = false
-
-            if (users.size == 0) {
-                noOneWorkCurrently.visibility = View.VISIBLE
-            }
-        })
+                .addOnFailureListener {
+                    toast(getString(R.string.errorLoading))
+                    swipeLayout.isRefreshing = false
+                    Log.e("Event ", it.toString())
+                    isLoading = false
+                }
     }
 
-    /**
-     * Get the users from the database filtered by language
-     */
-    private fun getUsersFiltered(query: Query) {
-        myProgressBar?.show()
-
-        query.addSnapshotListener(this, { snapshots, e ->
-            if (snapshots?.size()!! > 0) {
-                for (document in snapshots) {
-                    Log.d(DetailsActivity::class.simpleName, "User $document.id")
-
-                    val user = UserModel(document["project"] as String? ?: ""
-                            , document["languages"] as String? ?: ""
-                            , document["slackName"] as String? ?: "", "")
-
-                        rv.removeAllViews()
+    private val usersListener = EventListener<QuerySnapshot> { snapshots, _ ->
+        if (snapshots != null && snapshots.documentChanges.size > 0) {
+            for (dc in snapshots.documentChanges) {
+                val user =
+                        if (languageSpinner.selectedItemPosition > 0) {
+                            UserModel(dc.document["project"] as String? ?: ""
+                                    , dc.document["languages"] as String? ?: ""
+                                    , dc.document["slackName"] as String? ?: "", "")
+                        } else {
+                            dc.document.toObject(UserModel::class.java)
+                        }
+                Log.d(DetailsActivity::class.simpleName, "Process User $user")
+                when (dc.type) {
+                    DocumentChange.Type.ADDED -> {
+                        Log.d(DetailsActivity::class.simpleName, "Add User")
                         users.add(user)
+                        rv.adapter.notifyItemInserted(users.size - 1)
+                    }
+                    DocumentChange.Type.MODIFIED -> {
+                        Log.d(DetailsActivity::class.simpleName, "Modify User")
+                        val listUser = users.filter { it.slackName == dc.document["slackName"] }
+                        if (listUser.isNotEmpty()) {
+                            val index = users.indexOf(listUser[0])
+                            users.removeAt(index)
+                            users.add(index, user)
+                        }
+                        rv.adapter.notifyDataSetChanged()
+                    }
+                    DocumentChange.Type.REMOVED -> {
+                        Log.d(DetailsActivity::class.simpleName, "Remove User")
+                        val index = users.indexOf(user)
+                        users.removeAt(index)
+                        rv.adapter.notifyItemRemoved(index)
+                        rv.adapter.notifyItemRangeChanged(index, users.size)
+                    }
                 }
-                lastVisible = snapshots.documents[snapshots.size() - 1]
-            } else {
-                if (users.size == 0) {
-                    noOneWorkCurrently.visibility = View.VISIBLE
-                }
-                toast(getString(R.string.nothingToLoad))
-                swipeLayout.isRefreshing = false
-                Log.e("Event ", e.toString())
             }
-            myProgressBar?.dismiss()
-            swipeLayout.isRefreshing = false
-        })
+            isLoading = false
+        } else {
+//            Never goes there as size is checked before
+        }
+        myProgressBar?.dismiss()
+        swipeLayout.isRefreshing = false
     }
 
     /**
@@ -225,6 +266,9 @@ class DetailsActivity : MenuActivity() {
             clearUsers()
         }
 
+        lastVisible = null
+        isAllLoaded = false
+
         // If a language is selected
         if (languageSpinner.selectedItemPosition > 0) {
             val lang = languageSpinner.selectedItem.toString()
@@ -235,7 +279,7 @@ class DetailsActivity : MenuActivity() {
                     .whereEqualTo("project", projectNameExtra)
                     .limit(QueryUtils.getGetLimit())
 
-            getUsersFiltered(query)
+            getUsers(query)
         } else {
             loadUsers()
         }
@@ -248,5 +292,11 @@ class DetailsActivity : MenuActivity() {
         noOneWorkCurrently.visibility = View.GONE
         users.clear()
         rv.removeAllViews()
+    }
+
+    override fun refreshUI(p: ProjectsModel) {
+        if (p.name == projectNameExtra) {
+            nbOfUsersTxt.text = p.nbUsers.toString()
+        }
     }
 }
