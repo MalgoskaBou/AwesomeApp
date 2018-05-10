@@ -17,13 +17,13 @@
 package com.awesomeapp.android.awesomeapp
 
 import android.content.Intent
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
+
 
 //flag for registered user
 private const val RC_SIGN_IN = 1
@@ -52,6 +52,7 @@ open class MenuActivity : AppCompatActivity() {
         //check if user is login
         mAuthStateListener = FirebaseAuth.AuthStateListener { auth ->
             val user = auth.currentUser
+
             if (user == null) {
                 // User is signed out - show login screen
                 startActivityForResult(

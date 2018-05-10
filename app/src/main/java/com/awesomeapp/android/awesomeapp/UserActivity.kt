@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+@file:Suppress("DEPRECATION")
+
 package com.awesomeapp.android.awesomeapp
 
 import android.app.ProgressDialog
@@ -29,6 +31,8 @@ import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import com.firebase.ui.auth.AuthUI
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -40,7 +44,6 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import org.jetbrains.anko.*
 
 
-@Suppress("DEPRECATION")
 class UserActivity : AppCompatActivity() {
 
     //hooks to database
@@ -106,7 +109,7 @@ class UserActivity : AppCompatActivity() {
 
         //Put user data to database
         saveBtn.setOnClickListener { _ ->
-            saveUser()
+            saveUser(true)
         }
 
         logOutBtn.setOnClickListener { _ ->
@@ -133,6 +136,16 @@ class UserActivity : AppCompatActivity() {
             }
             false
         })
+
+
+        val completeListener = OnCompleteListener<AuthResult> { task ->
+            toast(task.isSuccessful.toString())
+
+            if (task.isSuccessful) {
+                val isNew = task.result.additionalUserInfo.isNewUser
+                Log.d("new user", "onComplete: " + if (isNew) "new user" else "old user")
+            }
+        }
     }
 
     private fun ifUserIsVerified() {
@@ -148,7 +161,7 @@ class UserActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveUser() {
+    private fun saveUser(ifStartNewActivity: Boolean) {
 
         // Get old values
         val oldLang1 = myUser.getLanguage(0)
@@ -221,7 +234,13 @@ class UserActivity : AppCompatActivity() {
             }
 
             toast(getString(R.string.dataSaved))
-            startActivity<MainActivity>()
+            if (ifStartNewActivity) {
+                alert(getString(R.string.data_are_saved_back_to_home_screen), getString(R.string.dataSaved)) {
+                    yesButton { startActivity<MainActivity>() }
+                    noButton { myProgressBar?.dismiss() }
+                    isCancelable = false
+                }.show()
+            }
 
         }).addOnFailureListener {
             toast(getString(R.string.somethingWrong))
@@ -361,7 +380,7 @@ class UserActivity : AppCompatActivity() {
                 updateUserData()
             } else {
                 toast(getString(R.string.chooseMessage))
-                saveUser()
+                saveUser(false)
             }
         })
     }
