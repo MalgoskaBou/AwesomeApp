@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.util.Log
 import android.view.View
+import com.awesomeapp.android.awesomeapp.R.id.*
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_ABND
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_AND
@@ -93,7 +94,7 @@ class MainActivity : MenuActivity() {
     }
 
     override fun onBackPressed() {
-        alert("Do you want close app?", "Close app") {
+        alert(getString(R.string.close_app_info), getString(R.string.close_app)) {
             yesButton { finishAffinity() }
             noButton {  }
             isCancelable = false
