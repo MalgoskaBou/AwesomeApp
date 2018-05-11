@@ -17,8 +17,12 @@
 package com.awesomeapp.android.awesomeapp
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
+import android.util.Log
 import android.view.View
+import com.awesomeapp.android.awesomeapp.R.id.*
 import com.awesomeapp.android.awesomeapp.data.Constant.TABLE_WITH_DATA
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_ABND
 import com.awesomeapp.android.awesomeapp.data.Constant.TRACK_AND
@@ -29,6 +33,10 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
+import org.jetbrains.anko.alert
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.yesButton
 
 
 class MainActivity : MenuActivity() {
@@ -83,5 +91,13 @@ class MainActivity : MenuActivity() {
             }
             QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
         })
+    }
+
+    override fun onBackPressed() {
+        alert(getString(R.string.close_app_info), getString(R.string.close_app)) {
+            yesButton { finishAffinity() }
+            noButton {  }
+            isCancelable = false
+        }.show()
     }
 }

@@ -66,6 +66,8 @@
     <string name="cancel_progressbar_info">The data will be saved in a moment, do you want to return to the main screen?</string>
     <string name="errorLoading">Error while loading data</string>
     <string name="data_are_saved_back_to_home_screen">Your data are saved, do you want to go back to the home screen?</string>
+    <string name="close_app">Close app</string>
+    <string name="close_app_info">do you want to turn off the application? \n(The app will still be available in the background)</string>
 
 
 </resources>
