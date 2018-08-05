@@ -18,6 +18,4 @@ package com.awesomeapp.android.awesomeapp.model
 
 import java.util.*
 
-data class ProjectsModel(var id: String, var name: String, var deadline: Date, var nbUsers: Long, var order: Long) {
-    constructor() : this("", "", Date(), 0, 0)
-}
+data class ProjectsModel(var id: String, var name: String, var deadline: Date, var nbUsers: Long, var order: Long)
