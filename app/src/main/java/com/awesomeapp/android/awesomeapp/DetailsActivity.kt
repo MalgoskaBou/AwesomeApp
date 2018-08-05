@@ -14,11 +14,10 @@
  *    limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
+//@file:Suppress("DEPRECATION")
 
 package com.awesomeapp.android.awesomeapp
 
-import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -41,7 +40,6 @@ import com.google.firebase.firestore.FieldPath.documentId
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
-import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 
 class DetailsActivity : MenuActivity(), ProjectRefreshable {
@@ -51,7 +49,6 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
     private var lastVisible: DocumentSnapshot? = null
     private lateinit var projectNameExtra: String
     private lateinit var rv: RecyclerView
-    private var myProgressBar: ProgressDialog? = null
     private lateinit var swipeLayout: SwipyRefreshLayout
     private var isLoading = false
     private var isAllLoaded = false
@@ -61,18 +58,15 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
         setContentView(R.layout.activity_details)
         setSupportActionBar(myToolbar)
 
-        val intent = intent
-        projectNameExtra = intent.getStringExtra(WHICH_PROJECT)
-        val deadlineExtra = intent.getStringExtra(WHICH_DEADLINE)
-        val nbUsersExtra = intent.getStringExtra(WHICH_NB_USERS)
+        with(intent) {
+            projectNameExtra = getStringExtra(WHICH_PROJECT)
+            deadLineTxt.text = getStringExtra(WHICH_DEADLINE)
+            nbOfUsersTxt.text = getStringExtra(WHICH_NB_USERS)
+        }
 
         projectNameTxt.text = projectNameExtra
-        deadLineTxt.text = deadlineExtra
-        nbOfUsersTxt.text = nbUsersExtra
 
         noOneWorkCurrently.visibility = View.GONE
-        myProgressBar = indeterminateProgressDialog(getString(R.string.waitingMessage))
-        myProgressBar?.show()
 
         rv = findViewById(R.id.usersList)
         rv.layoutManager = LinearLayoutManager(this, LinearLayout.VERTICAL, false)
@@ -81,9 +75,9 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
         initialiseLanguages()
 
         swipeLayout = findViewById(R.id.swipyrefreshlayout)
-        swipeLayout.setOnRefreshListener({
+        swipeLayout.setOnRefreshListener {
             loadMoreUsers()
-        })
+        }
 
         QueryUtils.addProjectRefreshableActivity(this)
     }
@@ -173,7 +167,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
                         query.startAt(firstItem).endAt(lastItem)
                                 .addSnapshotListener(this, usersListener)
                     } else {
-                        myProgressBar?.dismiss()
+                        indeterminateProgressBar.visibility = View.INVISIBLE
                         if (lastVisible != null) {
                             // We should listen after the first item in case a new user is inserted
                             query.startAfter(lastVisible!!)
@@ -239,7 +233,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
         } else {
 //            Never goes there as size is checked before
         }
-        myProgressBar?.dismiss()
+        indeterminateProgressBar.visibility = View.INVISIBLE
         swipeLayout.isRefreshing = false
     }
 
@@ -248,12 +242,10 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
      */
     private fun addChangeLangListener() {
         languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
-                filter()
-            }
+            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View
+                                        , position: Int, id: Long) = filter()
 
-            override fun onNothingSelected(parentView: AdapterView<*>) {
-                // do nothing
+            override fun onNothingSelected(parentView: AdapterView<*>) {/* do nothing */
             }
         }
     }

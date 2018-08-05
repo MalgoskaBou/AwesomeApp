@@ -33,5 +33,6 @@
     <dimen name="mediumMargin">24dp</dimen>
     <dimen name="bigMargin">34dp</dimen>
 
+    <dimen name="progressSize">48dp</dimen>
 
 </resources>
