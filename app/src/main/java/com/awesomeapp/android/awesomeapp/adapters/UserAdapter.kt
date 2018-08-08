@@ -33,9 +33,7 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
         return ViewHolder(v)
     }
 
-    override fun getItemCount(): Int {
-        return usersList.size
-    }
+    override fun getItemCount() = usersList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.slackName?.text = usersList[position].slackName
@@ -46,16 +44,4 @@ class UserAdapter (val usersList: ArrayList<UserModel>): RecyclerView.Adapter<Us
         val slackName: TextView? = itemView.userSlackName
         val languages: TextView? = itemView.languagesTxt
     }
-
-    // Clean all elements of the recycler
-    /*fun clear() {
-        usersList.clear()
-        notifyDataSetChanged()
-    }
-
-    // Add a list of users -- change to type used
-    fun addAll(list: List<UserModel>) {
-        usersList.addAll(list)
-        notifyDataSetChanged()
-    }*/
 }
