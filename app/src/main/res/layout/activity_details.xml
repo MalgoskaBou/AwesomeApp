@@ -106,6 +106,15 @@
 
     </com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout>
 
+    <ProgressBar
+        android:id="@+id/indeterminateProgressBar"
+        android:layout_width="@dimen/progressSize"
+        android:layout_height="@dimen/progressSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/noOneWorkCurrently"
         style="@style/bigText"

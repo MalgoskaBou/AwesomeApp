@@ -50,12 +50,14 @@ class MainActivity : MenuActivity() {
         val intentToData = Intent(this, ProjectsActivity::class.java)
 
         val clickListener = View.OnClickListener { v ->
-            when (v.id) {
-                R.id.andAndroid -> intentToData.putExtra(TABLE_WITH_DATA, TRACK_AND)
-                R.id.abndAndroid -> intentToData.putExtra(TABLE_WITH_DATA, TRACK_ABND)
-                R.id.mwsAndroid -> intentToData.putExtra(TABLE_WITH_DATA, TRACK_MWS)
-                R.id.fendAndroid -> intentToData.putExtra(TABLE_WITH_DATA, TRACK_FEND)
-            }
+            intentToData.putExtra(TABLE_WITH_DATA,
+                    when (v.id) {
+                        R.id.andAndroid -> TRACK_AND
+                        R.id.abndAndroid -> TRACK_ABND
+                        R.id.mwsAndroid -> TRACK_MWS
+                        R.id.fendAndroid -> TRACK_FEND
+                        else -> null
+                    })
             startActivity(intentToData)
         }
 
@@ -76,16 +78,16 @@ class MainActivity : MenuActivity() {
 
         // Set the default values
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults)
-        QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
+        QueryUtils.getLimit = mFirebaseRemoteConfig.getLong("limit_get_users")
 
-        mFirebaseRemoteConfig.fetch(0).addOnCompleteListener(this, {
+        mFirebaseRemoteConfig.fetch(0).addOnCompleteListener(this) {
             if (it.isSuccessful) {
                 // After config data is successfully fetched, it must be activated before newly fetched
                 // values are returned.
                 mFirebaseRemoteConfig.activateFetched()
             }
-            QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
-        })
+            QueryUtils.getLimit = mFirebaseRemoteConfig.getLong("limit_get_users")
+        }
     }
 
     override fun onBackPressed() {

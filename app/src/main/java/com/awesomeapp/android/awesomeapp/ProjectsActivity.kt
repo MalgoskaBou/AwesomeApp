@@ -57,7 +57,7 @@ class ProjectsActivity : MenuActivity(), ProjectRefreshable {
 
 
         //if the data in nbUsers will change or the projects will not be able to load when the application is first time turned on
-        swipyrefreshlayout.setOnRefreshListener({
+        swipyrefreshlayout.setOnRefreshListener {
             adapter.notifyDataSetChanged()
             swipyrefreshlayout.isRefreshing = false
 
@@ -66,7 +66,7 @@ class ProjectsActivity : MenuActivity(), ProjectRefreshable {
                 adapter = ProjectsAdapter(projects, this)
                 rv.adapter = adapter
             }
-        })
+        }
 
         if (projects.size == 0) {
             alert(getText(R.string.refresh_data_by_swip)) {

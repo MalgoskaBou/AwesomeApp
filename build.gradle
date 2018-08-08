@@ -46,7 +46,7 @@ buildscript {
         google_services_version = '4.0.1'
 
         // External library
-        anko_version = '0.10.4'
+        anko_version = '0.10.5'
         swipy_version = '1.2.3@aar'
 
          // Test

@@ -44,7 +44,6 @@
     <string name="selectLanguage">Select a language</string>
     <string name="selectProject">Select a project</string>
     <string name="log_out_message_for_delete_user">for security reasons you have to log out and log in again to delete your account correctly</string>
-    <string name="slack">Open slack</string>
     <string name="logoutConfirmation">are you sure that you want log out?</string>
     <string name="logout">Log out</string>
     <string name="deleteConfirmation">are you sure that you want delete your account?</string>
@@ -56,9 +55,7 @@
     <string name="dataSaved">Data saved</string>
     <string name="somethingWrong">Something wrong :( try again</string>
     <string name="userDeleted">User deleted successfully</string>
-    <string name="ok">OK</string>
     <string name="chooseMessage">Choose your track and current project</string>
-    <string name="waitingMessage">Wait for data loading</string>
     <string name="deadline">Deadline: </string>
     <string name="refresh_data_by_swip">Refresh data by swip</string>
     <string name="choose_your_track_first">choose your track first</string>

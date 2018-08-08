@@ -16,17 +16,15 @@
 
 package com.awesomeapp.android.awesomeapp.model
 
-data class UserModel(var currentProject: String, var language: String, var slackName: String
-                     , var userTrack: String) {
-    constructor() : this("", "", "", "")
+data class UserModel(var currentProject: String = "", var language: String = ""
+                     , var slackName: String = "", var userTrack: String = "") {
 
     fun getLanguage(index: Int): String {
-        var lang = ""
         try {
-            lang = language.split(",")[index]
+            return language.split(",")[index]
         } catch (e: IndexOutOfBoundsException) {
             // It could happen, just ignore it
         }
-        return lang
+        return ""
     }
 }

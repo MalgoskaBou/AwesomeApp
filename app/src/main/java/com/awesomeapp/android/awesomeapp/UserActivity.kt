@@ -14,8 +14,6 @@
  *    limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package com.awesomeapp.android.awesomeapp
 
 import android.app.ProgressDialog
@@ -31,8 +29,6 @@ import com.awesomeapp.android.awesomeapp.model.ProjectsModel
 import com.awesomeapp.android.awesomeapp.model.UserModel
 import com.awesomeapp.android.awesomeapp.util.QueryUtils
 import com.firebase.ui.auth.AuthUI
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -68,7 +64,7 @@ class UserActivity : AppCompatActivity() {
     private val spinnerAdapterProjects: HashMap<String, ArrayAdapter<String>> = HashMap()
 
     //anko loading window - because the first connection to the database takes quite a long time
-    private var myProgressBar: ProgressDialog? = null
+    private lateinit var myProgressBar: ProgressDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,8 +78,8 @@ class UserActivity : AppCompatActivity() {
 
         //loader window
         myProgressBar = indeterminateProgressDialog(getString(R.string.data_saving))
-        myProgressBar?.dismiss()
-        myProgressBar?.setOnCancelListener {
+        myProgressBar.dismiss()
+        myProgressBar.setOnCancelListener { _ ->
             alert(getString(R.string.cancel_progressbar_info)) {
                 yesButton { startActivity<MainActivity>() }
             }.show()
@@ -91,13 +87,11 @@ class UserActivity : AppCompatActivity() {
 
         // Set the listeners
         trackSpinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
+            override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View
+                                        , position: Int, id: Long) = updateProjectSpinner(trackSpinner.selectedItem.toString())
 
-                updateProjectSpinner(trackSpinner.selectedItem.toString())
-            }
 
-            override fun onNothingSelected(parentView: AdapterView<*>) {
-                // do nothing
+            override fun onNothingSelected(parentView: AdapterView<*>) {/* do nothing */
             }
         }
 
@@ -121,7 +115,7 @@ class UserActivity : AppCompatActivity() {
             }.show()
         }
 
-        deleteUserButton.setOnClickListener {
+        deleteUserButton.setOnClickListener { _ ->
             alert(getString(R.string.deleteConfirmation)) {
                 title = getString(R.string.deleteAccount)
                 yesButton { deleteUser() }
@@ -130,22 +124,22 @@ class UserActivity : AppCompatActivity() {
         }
 
         //information for the user that have to first select the track and then the project
-        projectsSpinner.setOnTouchListener({ _, _ ->
+        projectsSpinner.setOnTouchListener { _, _ ->
             if (projectsSpinner.adapter == null) {
                 toast(getString(R.string.choose_your_track_first))
             }
             false
-        })
+        }
 
 
-        val completeListener = OnCompleteListener<AuthResult> { task ->
+        /*val completeListener = OnCompleteListener<AuthResult> { task ->
             toast(task.isSuccessful.toString())
 
             if (task.isSuccessful) {
                 val isNew = task.result.additionalUserInfo.isNewUser
                 Log.d("new user", "onComplete: " + if (isNew) "new user" else "old user")
             }
-        }
+        }*/
     }
 
     private fun ifUserIsVerified() {
@@ -203,10 +197,10 @@ class UserActivity : AppCompatActivity() {
             newProject = QueryUtils.getProject(myUser.userTrack, myUser.currentProject)
         }
 
-        myProgressBar?.show()
+        myProgressBar.show()
 
         //put userdata to database (path to myUserdata is declared in getUserInfos function)
-        myUserData.set(myUser).addOnSuccessListener({
+        myUserData.set(myUser).addOnSuccessListener { _ ->
 
             var flagForceUpdateLanguage = false
             if (newProject?.id ?: "" != oldProject?.id ?: "") {
@@ -237,14 +231,15 @@ class UserActivity : AppCompatActivity() {
             if (ifStartNewActivity) {
                 alert(getString(R.string.data_are_saved_back_to_home_screen), getString(R.string.dataSaved)) {
                     yesButton { startActivity<MainActivity>() }
-                    noButton { myProgressBar?.dismiss() }
+                    noButton { myProgressBar.dismiss() }
                     isCancelable = false
                 }.show()
             }
 
-        }).addOnFailureListener {
+        }
+                .addOnFailureListener {
             toast(getString(R.string.somethingWrong))
-            myProgressBar?.dismiss()
+                    myProgressBar.dismiss()
         }
 
         if (!QueryUtils.checkInternetConnection(this)) {
@@ -255,17 +250,19 @@ class UserActivity : AppCompatActivity() {
 
     private fun updateProject(project: ProjectsModel, value: Long) {
         project.nbUsers = project.nbUsers + value
-        myDatabase.document("Projects/${project.id}").set(project).addOnSuccessListener({
+        myDatabase.document("Projects/${project.id}").set(project).addOnSuccessListener {
             Log.d(UserActivity::class.simpleName, "Project ${project.id} saved")
-        }).addOnFailureListener {
+        }
+                .addOnFailureListener {
             Log.d(UserActivity::class.simpleName, "Fail in Project ${project.id} saving")
         }
     }
 
     private fun updateUserByLang(user: String, userModel: UserModel?, old: String, new: String) {
-        myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener({
+        myDatabase.document("UsersByLanguage/${old}_$user").delete().addOnSuccessListener {
             Log.d(UserActivity::class.simpleName, "User $user deleted on $old")
-        }).addOnFailureListener {
+        }
+                .addOnFailureListener {
             Log.d(UserActivity::class.simpleName, "Fail in deletion $user on $old")
         }
 
@@ -274,10 +271,12 @@ class UserActivity : AppCompatActivity() {
             userByLanguageData["project"] = userModel!!.currentProject
             userByLanguageData["slackName"] = userModel.slackName
             userByLanguageData["languages"] = userModel.language
-            myDatabase.collection("UsersByLanguage").document("${new}_$user").set(userByLanguageData)
-                    .addOnSuccessListener({
+            myDatabase.collection("UsersByLanguage").document("${new}_$user")
+                    .set(userByLanguageData)
+                    .addOnSuccessListener {
                         Log.d(UserActivity::class.simpleName, "User $user saved on $new")
-                    }).addOnFailureListener {
+                    }
+                    .addOnFailureListener {
                         Log.d(UserActivity::class.simpleName, "Fail in saving $user on $new")
                     }
         }
@@ -296,11 +295,12 @@ class UserActivity : AppCompatActivity() {
                             val userPassword = EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD
                             EmailAuthProvider.getCredential(userEmail, userPassword)
                         } else {
-                            //Doesn't matter if it was Facebook Sign-in or others. It will always work using GoogleAuthProvider for whatever the provider.
+                            // Doesn't matter if it was Facebook Sign-in or others. It will always
+                            // work using GoogleAuthProvider for whatever the provider.
                             GoogleAuthProvider.getCredential(token, null)
                         }
 
-                        currentUser.reauthenticate(credential).addOnCompleteListener({
+                        currentUser.reauthenticate(credential).addOnCompleteListener {
                             if (task.isSuccessful) {
 
                                 //Calling delete to remove the user and wait for a result.
@@ -310,7 +310,7 @@ class UserActivity : AppCompatActivity() {
                                         toast(getString(R.string.userDeleted))
                                         //Delete data from database
 
-                                        //remove fetch data snapshot listenet for do not retrive data to database
+                                        //remove fetch data snapshot listener for do not retrieve data to database
                                         fetchDataListener.remove()
 
                                         //Decrease nbUser of the project
@@ -329,7 +329,6 @@ class UserActivity : AppCompatActivity() {
                                         myUserData.delete()
 
                                     } else {
-
                                         toast(getString(R.string.log_out_message_for_delete_user))
                                         Log.e("usun usera ", "${task.exception}")
                                     }
@@ -337,7 +336,7 @@ class UserActivity : AppCompatActivity() {
                                 startActivity<MainActivity>()
                                 finish()
                             }
-                        })
+                        }
                     }
                 }
     }
@@ -370,7 +369,7 @@ class UserActivity : AppCompatActivity() {
     private fun fetchUserData() {
 
         //get data from user collection
-        fetchDataListener = myUserData.addSnapshotListener(this, { snapshot, _ ->
+        fetchDataListener = myUserData.addSnapshotListener(this) { snapshot, _ ->
 
             if (snapshot?.exists()!!) {
                 slackNick.setText(snapshot.getString(SLACK_NAME))
@@ -382,7 +381,7 @@ class UserActivity : AppCompatActivity() {
                 toast(getString(R.string.chooseMessage))
                 saveUser(false)
             }
-        })
+        }
     }
 
     private fun updateUserData() {

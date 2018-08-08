@@ -41,9 +41,7 @@ class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val co
         return ViewHolder(v)
     }
 
-    override fun getItemCount(): Int {
-        return projectsList.size
-    }
+    override fun getItemCount() = projectsList.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val dateFormatter = SimpleDateFormat("MMM d yyyy", Locale.getDefault())
@@ -55,16 +53,18 @@ class ProjectsAdapter(val projectsList: ArrayList<ProjectsModel>, private val co
 
         val intentToDetails = Intent(context, DetailsActivity::class.java)
 
-        holder.itemView.setOnClickListener{
-            intentToDetails.putExtra(WHICH_PROJECT, projectsList[position].name)
-            intentToDetails.putExtra(WHICH_DEADLINE, formatedData)
-            intentToDetails.putExtra(WHICH_NB_USERS, projectsList[position].nbUsers.toString())
+        holder.itemView.setOnClickListener {
+            with(intentToDetails) {
+                putExtra(WHICH_PROJECT, projectsList[position].name)
+                putExtra(WHICH_DEADLINE, formatedData)
+                putExtra(WHICH_NB_USERS, projectsList[position].nbUsers.toString())
+            }
 
             context.startActivity(intentToDetails)
         }
     }
 
-    inner class ViewHolder (itemView: View): RecyclerView.ViewHolder(itemView){
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val projectNameTxt: TextView? = itemView.projectNameTxt
         val deadLineTxt: TextView? = itemView.deadLineTxt
         val nbOfUsersTxt: TextView? = itemView.nbOfUsersTxt
