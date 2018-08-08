@@ -21,4 +21,4 @@ package com.awesomeapp.android.awesomeapp.model
  * <p>
  */
 
-data class TrackModel(var id: String, var name: String)
+data class TrackModel(var id: String = "", var name: String = "")

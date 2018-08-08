@@ -44,7 +44,8 @@ class QueryUtils private constructor() {
         private val projects = HashMap<String, ArrayList<ProjectsModel>>()
         private val languages = ArrayList<LanguageModel>()
         private var isLoaded = false
-        private var getLimit = 1L
+        var getLimit = 1L
+
         private var projectsActivity = ArrayList<ProjectRefreshable>()
 
 
@@ -70,9 +71,8 @@ class QueryUtils private constructor() {
             }
         }
 
-        fun getTrack(track: String): TrackModel {
-            return tracks.filter { it.id == track }[0]
-        }
+        fun getTrack(track: String): TrackModel = tracks.filter { it.id == track }[0]
+
 
         fun getStringTracks(): ArrayList<String> {
             val array = ArrayList<String>()
@@ -82,9 +82,7 @@ class QueryUtils private constructor() {
             return array
         }
 
-        fun getProjects(track: String): ArrayList<ProjectsModel>? {
-            return projects[track]
-        }
+        fun getProjects(track: String): ArrayList<ProjectsModel>? = projects[track]
 
         fun getProject(track: String, project: String): ProjectsModel? {
             val list = projects[track]?.filter { projectsModel -> projectsModel.name == project }
@@ -102,9 +100,7 @@ class QueryUtils private constructor() {
             return array
         }
 
-        fun getLanguage(language: String): LanguageModel {
-            return languages.filter { it.id == language }[0]
-        }
+        fun getLanguage(language: String): LanguageModel = languages.filter { it.id == language }[0]
 
         fun getStringLanguages(): ArrayList<String> {
             val array = ArrayList<String>()
@@ -114,25 +110,11 @@ class QueryUtils private constructor() {
             return array
         }
 
-        fun setGetLimit(value: Long) {
-            getLimit = value
-        }
+        fun addProjectRefreshableActivity(a: ProjectRefreshable) = projectsActivity.add(a)
 
-        fun getGetLimit(): Long {
-            return getLimit
-        }
+        fun removeProjectRefreshableActivity(a: ProjectRefreshable) = projectsActivity.remove(a)
 
-        fun addProjectRefreshableActivity(a: ProjectRefreshable) {
-            projectsActivity.add(a)
-        }
-
-        fun removeProjectRefreshableActivity(a: ProjectRefreshable) {
-            projectsActivity.remove(a)
-        }
-
-        private fun refreshUI(p: ProjectsModel) {
-            projectsActivity.map { a -> a.refreshUI(p) }
-        }
+        private fun refreshUI(p: ProjectsModel) = projectsActivity.map { a -> a.refreshUI(p) }
 
         private fun loadTracks() {
             val tracksCollection = FirebaseFirestore.getInstance().collection("Tracks")

@@ -78,7 +78,7 @@ class MainActivity : MenuActivity() {
 
         // Set the default values
         mFirebaseRemoteConfig.setDefaults(R.xml.remote_config_defaults)
-        QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
+        QueryUtils.getLimit = mFirebaseRemoteConfig.getLong("limit_get_users")
 
         mFirebaseRemoteConfig.fetch(0).addOnCompleteListener(this) {
             if (it.isSuccessful) {
@@ -86,7 +86,7 @@ class MainActivity : MenuActivity() {
                 // values are returned.
                 mFirebaseRemoteConfig.activateFetched()
             }
-            QueryUtils.setGetLimit(mFirebaseRemoteConfig.getLong("limit_get_users"))
+            QueryUtils.getLimit = mFirebaseRemoteConfig.getLong("limit_get_users")
         }
     }
 

@@ -142,7 +142,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
         if (lastVisible != null) {
             tmpQuery = tmpQuery.startAfter(lastVisible!!)
         }
-        tmpQuery.limit(QueryUtils.getGetLimit())
+        tmpQuery.limit(QueryUtils.getLimit)
                 .get().addOnSuccessListener {
                     if (it.documents.isNotEmpty()) {
                         val firstItem = it.documents[0]
@@ -267,7 +267,7 @@ class DetailsActivity : MenuActivity(), ProjectRefreshable {
                     .whereGreaterThanOrEqualTo(documentId(), lang)
                     .whereLessThan(documentId(), lang + "a")
                     .whereEqualTo("project", projectNameExtra)
-                    .limit(QueryUtils.getGetLimit())
+                    .limit(QueryUtils.getLimit)
 
             getUsers(query)
         } else {

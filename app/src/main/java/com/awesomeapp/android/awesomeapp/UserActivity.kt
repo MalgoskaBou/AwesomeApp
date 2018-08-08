@@ -16,6 +16,7 @@
 
 package com.awesomeapp.android.awesomeapp
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -63,7 +64,7 @@ class UserActivity : AppCompatActivity() {
     private val spinnerAdapterProjects: HashMap<String, ArrayAdapter<String>> = HashMap()
 
     //anko loading window - because the first connection to the database takes quite a long time
-    private val myProgressBar = indeterminateProgressDialog(getString(R.string.data_saving))
+    private lateinit var myProgressBar: ProgressDialog
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +77,7 @@ class UserActivity : AppCompatActivity() {
         mAuth = FirebaseAuth.getInstance()
 
         //loader window
+        myProgressBar = indeterminateProgressDialog(getString(R.string.data_saving))
         myProgressBar.dismiss()
         myProgressBar.setOnCancelListener { _ ->
             alert(getString(R.string.cancel_progressbar_info)) {

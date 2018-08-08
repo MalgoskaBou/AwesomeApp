@@ -21,4 +21,4 @@ package com.awesomeapp.android.awesomeapp.model
  * <p>
  */
 
-data class LanguageModel(var id: String, var name: String)
+data class LanguageModel(var id: String = "", var name: String = "")

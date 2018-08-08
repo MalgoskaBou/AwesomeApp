@@ -18,4 +18,5 @@ package com.awesomeapp.android.awesomeapp.model
 
 import java.util.*
 
-data class ProjectsModel(var id: String, var name: String, var deadline: Date, var nbUsers: Long, var order: Long)
+data class ProjectsModel(var id: String = "", var name: String = "", var deadline: Date = Date()
+                         , var nbUsers: Long = 0, var order: Long = 0)
